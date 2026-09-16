@@ -1,6 +1,6 @@
 import { TRPCClientError, createTRPCClient, type TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
-import type { UserAppRouter } from "@repo/backend";
+import type { UserAppRouter } from "@repo/client";
 
 export type FakeTRPCHandler = (input: unknown) => unknown;
 export type FakeTRPCHandlers = Record<string, FakeTRPCHandler>;

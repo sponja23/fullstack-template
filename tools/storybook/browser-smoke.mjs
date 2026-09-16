@@ -53,6 +53,25 @@ const index = JSON.parse(await readFile(join(staticDir, "index.json"), "utf8"));
 const storyIds = Object.values(index.entries)
     .filter((entry) => entry.type === "story")
     .map((entry) => entry.id);
+const pageContentByStoryPrefix = new Map([
+    ["pages-dashboard", "Your workspace is ready"],
+    ["pages-settings-api-keys", "Manage credentials for external integrations."],
+    ["pages-settings-general", "Update the organization's identity and lifecycle."],
+    ["pages-settings-overview", "Manage organization identity, access, and credentials."],
+    ["pages-settings-members", "Review the roster, change roles, and invite teammates."],
+    ["pages-account", "Manage your display name and password."],
+    ["pages-superadmin-organizations", "Enter any organization as its owner."],
+    ["pages-new-organization", "It becomes your active organization when it is created."],
+    ["pages-onboarding", "Set up your workspace"],
+    ["pages-login", "New to Acme?"],
+    ["pages-signup", "Already have an account?"],
+]);
+const shellPagePrefixes = [
+    "pages-dashboard",
+    "pages-settings-",
+    "pages-account",
+    "pages-superadmin-",
+];
 const browser = await chromium.launch();
 const failures = [];
 
@@ -74,11 +93,24 @@ for (const id of storyIds) {
             );
             return {
                 rendered: rootHasContent || portalHasContent,
+                renderedText: document.body.textContent ?? "",
+                renderedShell: document.querySelector('[data-slot="sidebar"]') !== null,
                 storybookError: document.body.classList.contains("sb-show-errordisplay"),
             };
         });
         if (!state.rendered) errors.push("rendered no content");
         if (state.storybookError) errors.push("Storybook displayed an error");
+        if (id.endsWith("--populated") || id.endsWith("--empty")) {
+            const expected = [...pageContentByStoryPrefix].find(([prefix]) =>
+                id.startsWith(`${prefix}--`),
+            )?.[1];
+            if (expected !== undefined && !state.renderedText.includes(expected)) {
+                errors.push(`missing page content: ${expected}`);
+            }
+            if (shellPagePrefixes.some((prefix) => id.startsWith(prefix)) && !state.renderedShell) {
+                errors.push("rendered page without its application shell");
+            }
+        }
     } catch (error) {
         errors.push(String(error));
     }

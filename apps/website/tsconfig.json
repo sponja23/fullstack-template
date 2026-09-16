@@ -1,0 +1,10 @@
+{
+  "extends": "@repo/tsconfig/vite.json",
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src"]
+}

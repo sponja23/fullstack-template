@@ -3,7 +3,11 @@
   "compilerOptions": {
     "types": ["vite/client", "node"],
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@repo/website/*": ["../../apps/website/src/*"],
+      "@/*": ["../../apps/website/src/*"]
+    }
   },
   "include": ["src", ".storybook", "vite.config.ts", "vitest.config.ts"]
 }

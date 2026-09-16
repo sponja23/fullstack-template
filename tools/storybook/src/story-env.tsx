@@ -1,14 +1,11 @@
 import { Suspense, useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { z } from "zod";
 import type { Decorator } from "@storybook/tanstack-react";
-import type { UserAppRouter } from "@repo/backend";
+import { TRPCProvider } from "@repo/website/lib/trpc";
 import { seedSession, type FakeSession } from "./fake-auth";
 import { createFakeUserClient, type FakeTRPCHandler, type FakeTRPCHandlers } from "./fake-trpc";
 import { worlds, type SeededQuery, type WorldName } from "./worlds";
-
-const { TRPCProvider } = createTRPCContext<UserAppRouter>();
 
 const storyEnvSchema = z.object({
     world: z.enum(Object.keys(worlds) as [WorldName, ...WorldName[]]).optional(),
@@ -25,7 +22,7 @@ const storyEnvSchema = z.object({
 type StoryEnv = z.infer<typeof storyEnvSchema>;
 
 function EnvProvider({ env, children }: { env: StoryEnv; children: ReactNode }) {
-    const world = env.world ? worlds[env.world] : worlds.acme;
+    const world = env.world ? worlds[env.world] : worlds.acmeAgency;
     const [queryClient] = useState(() => {
         const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
         seedSession(client, env.session !== undefined ? env.session : world.session);

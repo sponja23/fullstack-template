@@ -19,6 +19,7 @@ export interface FakeSession {
         createdAt: Date;
         updatedAt: Date;
         token: string;
+        impersonatedBy?: string | null;
     };
 }
 

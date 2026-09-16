@@ -1,14 +1,13 @@
 import { serve } from "@hono/node-server";
 import { trpcServer } from "@hono/trpc-server";
 import { LoggingEmailSender, buildApp, buildAuth, buildDb } from "@repo/backend";
+import { USER_TRPC_PATH } from "@repo/client";
 import { logger } from "@repo/logger";
 import type { TelemetryTeardown } from "@repo/telemetry";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { env } from "./env.ts";
 import { loggingMiddleware } from "./logging.middleware.ts";
-
-const USER_TRPC_PATH = "/trpc";
 
 /** Builds the graph, starts HTTP, and returns graceful teardown. */
 export async function start(): Promise<TelemetryTeardown> {

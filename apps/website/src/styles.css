@@ -1,0 +1,19 @@
+@import "@repo/ui/styles.css";
+@import "@repo/ui/app.css";
+
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+@source "./**/*.{ts,tsx}";
+
+html,
+body,
+#app {
+    min-height: 100%;
+}
+body {
+    margin: 0;
+}
+@media print {
+    [data-slot="sidebar-wrapper"] {
+        display: block;
+    }
+}

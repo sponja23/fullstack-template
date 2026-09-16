@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@repo/backend": "workspace:*",
+    "@repo/client": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@repo/website": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/router-core": "catalog:",
