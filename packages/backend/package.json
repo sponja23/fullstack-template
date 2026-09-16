@@ -1,0 +1,49 @@
+{
+  "name": "@repo/backend",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "@repo/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./test-harness": "./test/harness.ts",
+    "./test-global-setup": "./test/global-setup.ts",
+    "./test-suite": "./test/suite.ts"
+  },
+  "scripts": {
+    "build": "vp build",
+    "db:generate": "NODE_OPTIONS=--conditions=@repo/source dotenv -e ../../.env -- drizzle-kit generate",
+    "db:push": "NODE_OPTIONS=--conditions=@repo/source dotenv -e ../../.env -- drizzle-kit push",
+    "db:studio": "NODE_OPTIONS=--conditions=@repo/source dotenv -e ../../.env -- drizzle-kit studio",
+    "db:migrate": "NODE_OPTIONS=--conditions=@repo/source dotenv -e ../../.env -- drizzle-kit migrate",
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@better-auth/api-key": "catalog:",
+    "@repo/logger": "workspace:*",
+    "@repo/telemetry": "workspace:*",
+    "@trpc/server": "catalog:",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "pg": "catalog:",
+    "superjson": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@testcontainers/postgresql": "catalog:",
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "dotenv-cli": "catalog:",
+    "drizzle-kit": "catalog:",
+    "testcontainers": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
