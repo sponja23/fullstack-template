@@ -31,7 +31,7 @@ export const Loading: Story = {
                     ...base.routeOverrides,
                     "/_authenticated/onboarding/": { beforeLoad: () => new Promise(() => {}) },
                 },
-            },
+            } as typeof base,
         },
     },
 };
@@ -49,7 +49,7 @@ export const Error: Story = {
                         },
                     },
                 },
-            },
+            } as typeof base,
         },
     },
 };

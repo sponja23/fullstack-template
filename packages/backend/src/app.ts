@@ -1,9 +1,29 @@
 import type { Auth } from "./auth/factory.ts";
 import type { Database } from "./db/factory.ts";
+import {
+    clientNameUnique,
+    projectRateNonnegative,
+    projectSlugUnique,
+    timeEntryMinutesPositive,
+} from "./db/schema/index.ts";
+import { BadRequestError } from "./errors/base.ts";
 import type { ConstraintViolationRegistry } from "./errors/constraint-violation.ts";
 import { apiKeyUserRouter } from "./routes/api-key/api-key.user.router.ts";
+import { ClientRepository } from "./routes/client/client.repository.ts";
+import { ClientService } from "./routes/client/client.service.ts";
+import { clientUserRouter } from "./routes/client/client.user.router.ts";
+import {
+    ClientNameTakenError,
+    ProjectSlugTakenError,
+} from "./routes/invoicing/invoicing.errors.ts";
+import { ProjectRepository } from "./routes/project/project.repository.ts";
+import { ProjectService } from "./routes/project/project.service.ts";
+import { projectUserRouter } from "./routes/project/project.user.router.ts";
 import { OrganizationDirectoryRepository } from "./routes/superadmin/organization-directory.repository.ts";
 import { superadminUserRouter } from "./routes/superadmin/superadmin.user.router.ts";
+import { TimeEntryRepository } from "./routes/time-entry/time-entry.repository.ts";
+import { TimeEntryService } from "./routes/time-entry/time-entry.service.ts";
+import { timeEntryUserRouter } from "./routes/time-entry/time-entry.user.router.ts";
 import type { AppContext, CreateContextInput } from "./trpc/context.ts";
 import { buildTrpc } from "./trpc/init.ts";
 import {
@@ -18,7 +38,12 @@ export interface AppDeps {
 }
 
 export function buildConstraintViolationRegistry(): ConstraintViolationRegistry {
-    return {};
+    return {
+        [clientNameUnique]: () => new ClientNameTakenError(),
+        [projectSlugUnique]: () => new ProjectSlugTakenError(),
+        [projectRateNonnegative]: () => new BadRequestError("Hourly rate cannot be negative"),
+        [timeEntryMinutesPositive]: () => new BadRequestError("Minutes must be positive"),
+    };
 }
 
 /** Composes the backend graph and returns routers, context, and caller factories. */
@@ -27,6 +52,12 @@ export function buildApp({ db, auth }: AppDeps) {
     const { authProcedure, orgProcedure } = buildUserProcedures(baseProcedure);
     const { superadminProcedure } = buildSuperadminProcedures(baseProcedure);
     const organizationDirectoryRepository = new OrganizationDirectoryRepository(db);
+    const clientRepository = new ClientRepository(db);
+    const projectRepository = new ProjectRepository(db);
+    const timeEntryRepository = new TimeEntryRepository(db);
+    const clientService = new ClientService(clientRepository);
+    const projectService = new ProjectService(projectRepository, clientRepository);
+    const timeEntryService = new TimeEntryService(timeEntryRepository, projectRepository);
 
     const userContext: UserRouterContext = { router, authProcedure, orgProcedure };
     const superadminContext: SuperadminRouterContext = { router, superadminProcedure };
@@ -42,6 +73,9 @@ export function buildApp({ db, auth }: AppDeps) {
             })),
         }),
         apiKeys: apiKeyUserRouter(userContext),
+        clients: clientUserRouter({ ...userContext, clientService }),
+        projects: projectUserRouter({ ...userContext, projectService }),
+        timeEntries: timeEntryUserRouter({ ...userContext, timeEntryService }),
         superadmin: superadminUserRouter({
             ...superadminContext,
             organizationDirectoryRepository,

@@ -4,15 +4,14 @@ import { storyRoute } from "@/routes/-story-route";
 const parents = {
     "/_authenticated": { beforeLoad: () => {} },
     "/_authenticated/_shell/_dashboard": { beforeLoad: () => {} },
-    "/_authenticated/_shell/_dashboard/settings": { loader: () => null },
 };
-const base: RouterParameters<undefined, "/settings/"> = {
-    route: storyRoute("/_authenticated/_shell/_dashboard/settings/"),
-    path: "/settings/",
+const base: RouterParameters<undefined, "/time/"> = {
+    route: storyRoute("/_authenticated/_shell/_dashboard/time/"),
+    path: "/time/",
     routeOverrides: parents,
 };
 const meta = {
-    title: "pages/Settings/Overview",
+    title: "pages/Time",
     parameters: { layout: "fullscreen", tanstack: { router: base } },
 } satisfies Meta;
 export default meta;
@@ -27,11 +26,11 @@ export const Loading: Story = {
                 ...base,
                 routeOverrides: {
                     ...parents,
-                    "/_authenticated/_shell/_dashboard/settings/": {
+                    "/_authenticated/_shell/_dashboard/time/": {
                         loader: () => new Promise(() => {}),
                     },
                 },
-            } as typeof base,
+            } as RouterParameters<undefined, "/time/">,
         },
     },
 };
@@ -43,13 +42,13 @@ export const Error: Story = {
                 ...base,
                 routeOverrides: {
                     ...parents,
-                    "/_authenticated/_shell/_dashboard/settings/": {
+                    "/_authenticated/_shell/_dashboard/time/": {
                         loader: () => {
-                            throw new globalThis.Error("Settings unavailable");
+                            throw new globalThis.Error("Time unavailable");
                         },
                     },
                 },
-            } as typeof base,
+            } as RouterParameters<undefined, "/time/">,
         },
     },
 };

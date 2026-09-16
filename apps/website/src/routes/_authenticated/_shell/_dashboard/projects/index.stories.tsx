@@ -1,16 +1,17 @@
 import type { Meta, RouterParameters, StoryObj } from "@storybook/tanstack-react";
 import { storyRoute } from "@/routes/-story-route";
 
-const base: RouterParameters<undefined, "/"> = {
-    route: storyRoute("/_authenticated/_shell/_dashboard/"),
-    path: "/",
-    routeOverrides: {
-        "/_authenticated": { beforeLoad: () => {} },
-        "/_authenticated/_shell/_dashboard": { beforeLoad: () => {} },
-    },
+const parents = {
+    "/_authenticated": { beforeLoad: () => {} },
+    "/_authenticated/_shell/_dashboard": { beforeLoad: () => {} },
+};
+const base: RouterParameters<undefined, "/projects/"> = {
+    route: storyRoute("/_authenticated/_shell/_dashboard/projects/"),
+    path: "/projects/",
+    routeOverrides: parents,
 };
 const meta = {
-    title: "pages/Dashboard",
+    title: "pages/Projects/List",
     parameters: { layout: "fullscreen", tanstack: { router: base } },
 } satisfies Meta;
 export default meta;
@@ -24,10 +25,12 @@ export const Loading: Story = {
             router: {
                 ...base,
                 routeOverrides: {
-                    ...base.routeOverrides,
-                    "/_authenticated/_shell/_dashboard/": { loader: () => new Promise(() => {}) },
+                    ...parents,
+                    "/_authenticated/_shell/_dashboard/projects/": {
+                        loader: () => new Promise(() => {}),
+                    },
                 },
-            },
+            } as RouterParameters<undefined, "/projects/">,
         },
     },
 };
@@ -38,14 +41,14 @@ export const Error: Story = {
             router: {
                 ...base,
                 routeOverrides: {
-                    ...base.routeOverrides,
-                    "/_authenticated/_shell/_dashboard/": {
+                    ...parents,
+                    "/_authenticated/_shell/_dashboard/projects/": {
                         loader: () => {
-                            throw new globalThis.Error("Dashboard unavailable");
+                            throw new globalThis.Error("Projects unavailable");
                         },
                     },
                 },
-            },
+            } as RouterParameters<undefined, "/projects/">,
         },
     },
 };

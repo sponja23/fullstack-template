@@ -25,7 +25,7 @@ export const Loading: Story = {
                     ...parents,
                     "/_authenticated/_shell/account/": { loader: () => new Promise(() => {}) },
                 },
-            },
+            } as typeof base,
         },
     },
 };
@@ -43,7 +43,7 @@ export const Error: Story = {
                         },
                     },
                 },
-            },
+            } as typeof base,
         },
     },
 };

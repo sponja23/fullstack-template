@@ -54,7 +54,11 @@ const storyIds = Object.values(index.entries)
     .filter((entry) => entry.type === "story")
     .map((entry) => entry.id);
 const pageContentByStoryPrefix = new Map([
-    ["pages-dashboard", "Your workspace is ready"],
+    ["pages-clients-detail", "Billing details"],
+    ["pages-clients-list", "Companies your organization bills."],
+    ["pages-projects-detail", "Work recorded against this project."],
+    ["pages-projects-list", "Billable work across all clients."],
+    ["pages-time", "Only work authored by you is shown."],
     ["pages-settings-api-keys", "Manage credentials for external integrations."],
     ["pages-settings-general", "Update the organization's identity and lifecycle."],
     ["pages-settings-overview", "Manage organization identity, access, and credentials."],
@@ -67,7 +71,9 @@ const pageContentByStoryPrefix = new Map([
     ["pages-signup", "Already have an account?"],
 ]);
 const shellPagePrefixes = [
-    "pages-dashboard",
+    "pages-clients-",
+    "pages-projects-",
+    "pages-time",
     "pages-settings-",
     "pages-account",
     "pages-superadmin-",

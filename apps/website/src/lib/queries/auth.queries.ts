@@ -19,6 +19,13 @@ export function ensureSessionData(queryClient: QueryClient) {
     return queryClient.ensureQueryData(sessionQueryOptions());
 }
 
+export async function ensureActiveOrganizationId(queryClient: QueryClient): Promise<string> {
+    const session = await ensureSessionData(queryClient);
+    const organizationId = session?.session.activeOrganizationId;
+    if (organizationId == null) throw new Error("An active organization is required");
+    return organizationId;
+}
+
 export type User = typeof authClient.$Infer.Session.user;
 
 export function useAuth() {

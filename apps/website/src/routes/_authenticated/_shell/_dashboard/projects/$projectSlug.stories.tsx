@@ -4,52 +4,56 @@ import { storyRoute } from "@/routes/-story-route";
 const parents = {
     "/_authenticated": { beforeLoad: () => {} },
     "/_authenticated/_shell/_dashboard": { beforeLoad: () => {} },
-    "/_authenticated/_shell/_dashboard/settings": { loader: () => null },
 };
-const base: RouterParameters<undefined, "/settings/"> = {
-    route: storyRoute("/_authenticated/_shell/_dashboard/settings/"),
-    path: "/settings/",
+const base: RouterParameters<undefined, "/projects/$projectSlug"> = {
+    route: storyRoute("/_authenticated/_shell/_dashboard/projects/$projectSlug"),
+    path: "/projects/$projectSlug",
+    params: { projectSlug: "brand-refresh" },
     routeOverrides: parents,
 };
 const meta = {
-    title: "pages/Settings/Overview",
+    title: "pages/Projects/Detail",
     parameters: { layout: "fullscreen", tanstack: { router: base } },
 } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Populated: Story = { parameters: { env: { world: "acmeAgency" } } };
-export const Empty: Story = { parameters: { env: { world: "emptyOrg" } } };
+export const Empty: Story = {
+    parameters: {
+        env: { world: "acmeAgency", handlers: { "timeEntries.listForProject": () => [] } },
+    },
+};
 export const Loading: Story = {
     parameters: {
-        env: { world: "emptyOrg" },
+        env: { world: "acmeAgency" },
         tanstack: {
             router: {
                 ...base,
                 routeOverrides: {
                     ...parents,
-                    "/_authenticated/_shell/_dashboard/settings/": {
+                    "/_authenticated/_shell/_dashboard/projects/$projectSlug": {
                         loader: () => new Promise(() => {}),
                     },
                 },
-            } as typeof base,
+            } as RouterParameters<undefined, "/projects/$projectSlug">,
         },
     },
 };
 export const Error: Story = {
     parameters: {
-        env: { world: "emptyOrg" },
+        env: { world: "acmeAgency" },
         tanstack: {
             router: {
                 ...base,
                 routeOverrides: {
                     ...parents,
-                    "/_authenticated/_shell/_dashboard/settings/": {
+                    "/_authenticated/_shell/_dashboard/projects/$projectSlug": {
                         loader: () => {
-                            throw new globalThis.Error("Settings unavailable");
+                            throw new globalThis.Error("Project unavailable");
                         },
                     },
                 },
-            } as typeof base,
+            } as RouterParameters<undefined, "/projects/$projectSlug">,
         },
     },
 };

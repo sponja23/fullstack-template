@@ -1,5 +1,5 @@
 import { Link, Outlet, createFileRoute, redirect } from "@tanstack/react-router";
-import { LayoutDashboard, Settings } from "lucide-react";
+import { BriefcaseBusiness, Building2, Clock3, ReceiptText, Settings } from "lucide-react";
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -42,7 +42,6 @@ export const Route = createFileRoute("/_authenticated/_shell/_dashboard")({
 
 function DashboardSidebar() {
     const { data: organization } = useActiveOrganization();
-    const dashboardActive = useRouteActive({ to: "/", activeOptions: { exact: true } });
     const settingsActive = useRouteActive({ to: "/settings", activeOptions: { exact: false } });
     return (
         <>
@@ -53,14 +52,13 @@ function DashboardSidebar() {
             </SectionHeader>
             <SidebarGroup>
                 <SidebarMenu>
+                    <DashboardLink to="/clients" label="Clients" Icon={Building2} />
+                    <DashboardLink to="/projects" label="Projects" Icon={BriefcaseBusiness} />
+                    <DashboardLink to="/time" label="Time" Icon={Clock3} />
                     <SidebarMenuItem>
-                        <SidebarMenuButton
-                            tooltip="Dashboard"
-                            isActive={dashboardActive}
-                            render={<Link to="/" />}
-                        >
-                            <LayoutDashboard />
-                            <span>Dashboard</span>
+                        <SidebarMenuButton tooltip="Invoices (coming soon)" disabled>
+                            <ReceiptText />
+                            <span>Invoices</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -81,5 +79,25 @@ function DashboardSidebar() {
                 </SidebarMenu>
             </SidebarGroup>
         </>
+    );
+}
+
+function DashboardLink({
+    to,
+    label,
+    Icon,
+}: {
+    to: "/clients" | "/projects" | "/time";
+    label: string;
+    Icon: typeof Building2;
+}) {
+    const active = useRouteActive({ to, activeOptions: { exact: false } });
+    return (
+        <SidebarMenuItem>
+            <SidebarMenuButton tooltip={label} isActive={active} render={<Link to={to} />}>
+                <Icon />
+                <span>{label}</span>
+            </SidebarMenuButton>
+        </SidebarMenuItem>
     );
 }

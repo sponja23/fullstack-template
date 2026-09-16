@@ -20,7 +20,7 @@ export const Loading: Story = {
             router: {
                 ...base,
                 routeOverrides: { "/signup/": { loader: () => new Promise(() => {}) } },
-            },
+            } as typeof base,
         },
     },
 };
@@ -37,7 +37,7 @@ export const Error: Story = {
                         },
                     },
                 },
-            },
+            } as typeof base,
         },
     },
 };

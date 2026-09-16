@@ -31,7 +31,7 @@ export const Loading: Story = {
                         loader: () => new Promise(() => {}),
                     },
                 },
-            },
+            } as typeof base,
         },
     },
 };
@@ -49,7 +49,7 @@ export const Error: Story = {
                         },
                     },
                 },
-            },
+            } as typeof base,
         },
     },
 };
