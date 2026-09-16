@@ -1,0 +1,17 @@
+{
+  "autoMemoryEnabled": false,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command' | grep -qE 'gh +pr +(create|edit)' && printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"This is a gh pr create/edit call. Per the issue-tracker skill: use Closes #XXX when the PR resolves an issue and Refs #XXX when it does not.\"}}' || true",
+            "statusMessage": "Checking PR issue linkage"
+          }
+        ]
+      }
+    ]
+  }
+}

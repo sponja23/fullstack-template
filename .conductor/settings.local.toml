@@ -1,0 +1,10 @@
+"$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
+file_include_globs = ""
+
+[prompts]
+create_pr = "Use conventional commits for the PR title. Open the branch as a draft."
+
+[scripts]
+archive = "rm -rf node_modules/"
+run_mode = "concurrent"
+setup = ".conductor/conductor-setup.sh"

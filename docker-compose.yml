@@ -1,0 +1,31 @@
+# Pin the project name so containers, networks, and volumes stay stable across worktrees.
+name: acme
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: acme
+    # Avoid colliding with a local Postgres already listening on its default port.
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d acme"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  otel-lgtm:
+    image: grafana/otel-lgtm
+    profiles: [telemetry]
+    ports:
+      - "3001:3000"
+      - "4317:4317"
+      - "4318:4318"
+
+volumes:
+  postgres-data:

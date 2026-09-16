@@ -1,0 +1,29 @@
+{
+  "name": "acme",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ready": "vp check && vp run -r build",
+    "dev": "concurrently -n web,api -c blue,green \"pnpm dev:web\" \"pnpm dev:api\"",
+    "dev:web": "pnpm --filter @repo/website dev",
+    "dev:api": "pnpm --filter @repo/api dev",
+    "dev:storybook": "pnpm --filter @repo/storybook dev",
+    "db:up": "docker compose up -d --wait postgres && pnpm db:migrate",
+    "db:down": "docker compose stop postgres",
+    "db:migrate": "pnpm --filter @repo/backend db:migrate",
+    "db:generate": "pnpm --filter @repo/backend db:generate",
+    "db:studio": "pnpm --filter @repo/backend db:studio",
+    "telemetry:up": "docker compose --profile telemetry up -d",
+    "telemetry:down": "docker compose --profile telemetry down",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "concurrently": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.33.3"
+}
