@@ -1,0 +1,10 @@
+{
+  "extends": "@repo/tsconfig/node.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rewriteRelativeImportExtensions": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

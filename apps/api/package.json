@@ -1,0 +1,31 @@
+{
+  "name": "@repo/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --import=tsx --conditions=@repo/source --env-file=../../.env src/index.ts",
+    "build": "vp build",
+    "test": "vp test run",
+    "start": "node --env-file=../../.env dist/index.js",
+    "superadmin:grant": "node --import=tsx --conditions=@repo/source --env-file=../../.env src/superadmin-grant.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "catalog:",
+    "@hono/trpc-server": "catalog:",
+    "@repo/backend": "workspace:*",
+    "@repo/logger": "workspace:*",
+    "@repo/telemetry": "workspace:*",
+    "@t3-oss/env-core": "catalog:",
+    "@trpc/server": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
