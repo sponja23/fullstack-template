@@ -1,0 +1,9 @@
+@import "@repo/ui/styles.css";
+@import "@repo/ui/app.css";
+
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+@source "../../../apps/website/src/**/*.{ts,tsx}";
+
+body {
+    min-height: 100vh;
+}

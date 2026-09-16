@@ -1,0 +1,9 @@
+{
+  "extends": "@repo/tsconfig/vite.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"],
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src", ".storybook", "vite.config.ts", "vitest.config.ts"]
+}
