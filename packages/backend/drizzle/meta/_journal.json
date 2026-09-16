@@ -15,6 +15,13 @@
       "when": 1789584089384,
       "tag": "0001_nostalgic_nighthawk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789586193336,
+      "tag": "0002_steep_synch",
+      "breakpoints": true
     }
   ]
 }

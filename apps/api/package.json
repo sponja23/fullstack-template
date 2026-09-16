@@ -16,6 +16,7 @@
     "@repo/backend": "workspace:*",
     "@repo/client": "workspace:*",
     "@repo/logger": "workspace:*",
+    "@repo/rest-api": "workspace:*",
     "@repo/telemetry": "workspace:*",
     "@t3-oss/env-core": "catalog:",
     "@trpc/server": "catalog:",

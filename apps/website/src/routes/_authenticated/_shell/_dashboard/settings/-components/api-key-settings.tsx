@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
+import { Checkbox } from "@repo/ui/checkbox";
+import { API_SCOPES, SCOPE_CATALOG, type ApiScope } from "@/lib/api-scopes";
 import { useApiKeys, useIssueApiKey, useRevokeApiKey } from "@/lib/queries/api-keys.queries";
 
 export function ApiKeySettings() {
@@ -10,6 +12,7 @@ export function ApiKeySettings() {
     const revoke = useRevokeApiKey();
     const [name, setName] = useState("");
     const [secret, setSecret] = useState<string | null>(null);
+    const [scopes, setScopes] = useState<ApiScope[]>([]);
     return (
         <div className="space-y-6">
             <Card>
@@ -32,6 +35,9 @@ export function ApiKeySettings() {
                                         <p className="text-sm font-medium">{key.name}</p>
                                         <p className="font-mono text-xs text-muted-foreground">
                                             {key.start}••••
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {key.scopes.join(", ")}
                                         </p>
                                     </div>
                                     <Button
@@ -60,6 +66,23 @@ export function ApiKeySettings() {
                             <code className="break-all text-xs">{secret}</code>
                         </div>
                     )}
+                    <div className="grid gap-2 sm:grid-cols-3">
+                        {API_SCOPES.map((scope) => (
+                            <label key={scope} className="flex items-center gap-2 text-sm">
+                                <Checkbox
+                                    checked={scopes.includes(scope)}
+                                    onCheckedChange={(checked) =>
+                                        setScopes((current) =>
+                                            checked
+                                                ? [...current, scope]
+                                                : current.filter((value) => value !== scope),
+                                        )
+                                    }
+                                />
+                                {SCOPE_CATALOG[scope]}
+                            </label>
+                        ))}
+                    </div>
                     <div className="flex gap-2">
                         <Input
                             aria-label="Key name"
@@ -68,14 +91,15 @@ export function ApiKeySettings() {
                             onChange={(event) => setName(event.target.value)}
                         />
                         <Button
-                            disabled={issue.isPending || name.trim() === ""}
+                            disabled={issue.isPending || name.trim() === "" || scopes.length === 0}
                             onClick={() =>
                                 issue.mutate(
-                                    { name: name.trim() },
+                                    { name: name.trim(), scopes },
                                     {
                                         onSuccess: (minted) => {
                                             setSecret(minted.key);
                                             setName("");
+                                            setScopes([]);
                                         },
                                     },
                                 )

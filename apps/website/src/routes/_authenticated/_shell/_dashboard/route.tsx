@@ -55,12 +55,7 @@ function DashboardSidebar() {
                     <DashboardLink to="/clients" label="Clients" Icon={Building2} />
                     <DashboardLink to="/projects" label="Projects" Icon={BriefcaseBusiness} />
                     <DashboardLink to="/time" label="Time" Icon={Clock3} />
-                    <SidebarMenuItem>
-                        <SidebarMenuButton tooltip="Invoices (coming soon)" disabled>
-                            <ReceiptText />
-                            <span>Invoices</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    <DashboardLink to="/invoices" label="Invoices" Icon={ReceiptText} />
                 </SidebarMenu>
             </SidebarGroup>
             <SidebarGroup className="mt-auto">
@@ -87,7 +82,7 @@ function DashboardLink({
     label,
     Icon,
 }: {
-    to: "/clients" | "/projects" | "/time";
+    to: "/clients" | "/projects" | "/time" | "/invoices";
     label: string;
     Icon: typeof Building2;
 }) {

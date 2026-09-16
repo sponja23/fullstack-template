@@ -1,5 +1,15 @@
 import { relations, sql } from "drizzle-orm";
-import { check, date, index, integer, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
+import {
+    check,
+    date,
+    index,
+    integer,
+    pgTable,
+    text,
+    timestamp,
+    unique,
+    uniqueIndex,
+} from "drizzle-orm/pg-core";
 import type { ConstraintName } from "../constraint-names.ts";
 import { member, organization } from "./organizations.schema.ts";
 
@@ -9,11 +19,17 @@ export const clientStatuses = ["active", "archived"] as const;
 export type ClientStatus = (typeof clientStatuses)[number];
 export const projectStatuses = ["active", "archived"] as const;
 export type ProjectStatus = (typeof projectStatuses)[number];
+export const invoiceStatuses = ["draft", "issued", "paid", "void"] as const;
+export type InvoiceStatus = (typeof invoiceStatuses)[number];
+export const lineItemKinds = ["generated", "manual"] as const;
+export type LineItemKind = (typeof lineItemKinds)[number];
 
 export const clientNameUnique = "client_organization_name_unique" satisfies ConstraintName;
 export const projectSlugUnique = "project_organization_slug_unique" satisfies ConstraintName;
 export const projectRateNonnegative = "project_rate_minor_nonnegative" satisfies ConstraintName;
 export const timeEntryMinutesPositive = "time_entry_minutes_positive" satisfies ConstraintName;
+export const invoiceNumberUnique = "invoice_organization_number_unique" satisfies ConstraintName;
+export const lineItemQuantityPositive = "line_item_quantity_positive" satisfies ConstraintName;
 
 export const client = pgTable(
     "client",
@@ -60,6 +76,66 @@ export const project = pgTable(
     ],
 );
 
+export const invoice = pgTable(
+    "invoice",
+    {
+        id: text("id").primaryKey(),
+        organizationId: text("organization_id")
+            .notNull()
+            .references(() => organization.id, { onDelete: "cascade" }),
+        clientId: text("client_id")
+            .notNull()
+            .references(() => client.id, { onDelete: "restrict" }),
+        currency: text("currency", { enum: currencies }).notNull(),
+        number: integer("number"),
+        status: text("status", { enum: invoiceStatuses }).default("draft").notNull(),
+        issuedAt: timestamp("issued_at"),
+        paidAt: timestamp("paid_at"),
+        voidedAt: timestamp("voided_at"),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    },
+    (table) => [
+        uniqueIndex(invoiceNumberUnique)
+            .on(table.organizationId, table.number)
+            .where(sql`${table.number} is not null`),
+        index("invoice_organization_idx").on(table.organizationId),
+        index("invoice_client_idx").on(table.clientId),
+    ],
+);
+
+export const lineItem = pgTable(
+    "line_item",
+    {
+        id: text("id").primaryKey(),
+        invoiceId: text("invoice_id")
+            .notNull()
+            .references(() => invoice.id, { onDelete: "cascade" }),
+        projectId: text("project_id").references(() => project.id, { onDelete: "restrict" }),
+        kind: text("kind", { enum: lineItemKinds }).notNull(),
+        description: text("description").notNull(),
+        quantity: integer("quantity").notNull(),
+        unitAmountMinor: integer("unit_amount_minor").notNull(),
+        totalMinor: integer("total_minor").notNull(),
+        sourceEntryIds: text("source_entry_ids")
+            .array()
+            .default(sql`'{}'::text[]`)
+            .notNull(),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+    },
+    (table) => [
+        check(lineItemQuantityPositive, sql`${table.quantity} > 0`),
+        index("line_item_invoice_idx").on(table.invoiceId),
+    ],
+);
+
+export const invoiceCounter = pgTable("invoice_counter", {
+    organizationId: text("organization_id")
+        .primaryKey()
+        .references(() => organization.id, { onDelete: "cascade" }),
+    next: integer("next").default(0).notNull(),
+});
+
 export const timeEntry = pgTable(
     "time_entry",
     {
@@ -77,7 +153,7 @@ export const timeEntry = pgTable(
         minutes: integer("minutes").notNull(),
         note: text("note").notNull(),
         // The invoice slice adds the foreign key when it introduces line_item.
-        lineItemId: text("line_item_id"),
+        lineItemId: text("line_item_id").references(() => lineItem.id, { onDelete: "restrict" }),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at").defaultNow().notNull(),
     },
@@ -113,4 +189,20 @@ export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
     }),
     project: one(project, { fields: [timeEntry.projectId], references: [project.id] }),
     author: one(member, { fields: [timeEntry.authorId], references: [member.id] }),
+    lineItem: one(lineItem, { fields: [timeEntry.lineItemId], references: [lineItem.id] }),
+}));
+
+export const invoiceRelations = relations(invoice, ({ one, many }) => ({
+    organization: one(organization, {
+        fields: [invoice.organizationId],
+        references: [organization.id],
+    }),
+    client: one(client, { fields: [invoice.clientId], references: [client.id] }),
+    lineItems: many(lineItem),
+}));
+
+export const lineItemRelations = relations(lineItem, ({ one, many }) => ({
+    invoice: one(invoice, { fields: [lineItem.invoiceId], references: [invoice.id] }),
+    project: one(project, { fields: [lineItem.projectId], references: [project.id] }),
+    timeEntries: many(timeEntry),
 }));

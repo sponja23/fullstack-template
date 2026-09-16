@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
 import { expect } from "vitest";
-import { timeEntry } from "../../src/db/schema/index.ts";
 import { apiTestSuite } from "../suite.ts";
 
 apiTestSuite({
@@ -71,7 +69,6 @@ apiTestSuite({
         });
 
         test("refuses changes to billed entries and reports missing entries", async ({
-            harness,
             request,
         }) => {
             const client = await request.clients.create({
@@ -91,10 +88,12 @@ apiTestSuite({
                 minutes: 45,
                 note: "Claimed",
             });
-            await harness.db
-                .update(timeEntry)
-                .set({ lineItemId: "future-line-item" })
-                .where(eq(timeEntry.id, entry.id));
+            const invoice = await request.invoices.createDraft({ clientId: client.id });
+            await request.invoices.addTimeLines({
+                invoiceId: invoice.id,
+                entryIds: [entry.id],
+            });
+            await request.invoices.issue({ id: invoice.id });
             await expect(request.timeEntries.delete({ id: entry.id })).rejects.toMatchObject({
                 cause: { errorCode: "TIME_ENTRY_BILLED" },
             });

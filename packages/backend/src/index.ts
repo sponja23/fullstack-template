@@ -10,4 +10,7 @@ export type { Database, DatabaseExecutor, DbBundle, DbConfig } from "./db/factor
 export { migrateDatabase } from "./db/migrate.ts";
 export { LoggingEmailSender, outgoingEmailSchema } from "./email/email-sender.ts";
 export type { EmailSender, OutgoingEmail } from "./email/email-sender.ts";
+export { API_SCOPES, apiScopeSchema, scopesFromMetadata } from "./routes/api-key/api-key.scopes.ts";
+export type { ApiScope, ApiKeyMetadata } from "./routes/api-key/api-key.scopes.ts";
+export type { Currency, InvoiceStatus, LineItemKind } from "./db/schema/invoicing.schema.ts";
 export * from "./errors/index.ts";

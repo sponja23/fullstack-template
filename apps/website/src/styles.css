@@ -1,6 +1,19 @@
 @import "@repo/ui/styles.css";
 @import "@repo/ui/app.css";
 
+@media print {
+    @page {
+        margin: 0;
+    }
+    body {
+        background: white;
+    }
+    .invoice-print {
+        max-width: none;
+        padding: 18mm;
+    }
+}
+
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 @source "./**/*.{ts,tsx}";
 

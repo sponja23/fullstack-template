@@ -2,6 +2,8 @@ import type { Auth } from "./auth/factory.ts";
 import type { Database } from "./db/factory.ts";
 import {
     clientNameUnique,
+    invoiceNumberUnique,
+    lineItemQuantityPositive,
     projectRateNonnegative,
     projectSlugUnique,
     timeEntryMinutesPositive,
@@ -16,6 +18,9 @@ import {
     ClientNameTakenError,
     ProjectSlugTakenError,
 } from "./routes/invoicing/invoicing.errors.ts";
+import { InvoiceRepository } from "./routes/invoice/invoice.repository.ts";
+import { InvoiceService } from "./routes/invoice/invoice.service.ts";
+import { invoiceUserRouter } from "./routes/invoice/invoice.user.router.ts";
 import { ProjectRepository } from "./routes/project/project.repository.ts";
 import { ProjectService } from "./routes/project/project.service.ts";
 import { projectUserRouter } from "./routes/project/project.user.router.ts";
@@ -43,6 +48,9 @@ export function buildConstraintViolationRegistry(): ConstraintViolationRegistry 
         [projectSlugUnique]: () => new ProjectSlugTakenError(),
         [projectRateNonnegative]: () => new BadRequestError("Hourly rate cannot be negative"),
         [timeEntryMinutesPositive]: () => new BadRequestError("Minutes must be positive"),
+        [invoiceNumberUnique]: () => new BadRequestError("Invoice number is already in use"),
+        [lineItemQuantityPositive]: () =>
+            new BadRequestError("Line item quantity must be positive"),
     };
 }
 
@@ -55,9 +63,11 @@ export function buildApp({ db, auth }: AppDeps) {
     const clientRepository = new ClientRepository(db);
     const projectRepository = new ProjectRepository(db);
     const timeEntryRepository = new TimeEntryRepository(db);
+    const invoiceRepository = new InvoiceRepository(db);
     const clientService = new ClientService(clientRepository);
     const projectService = new ProjectService(projectRepository, clientRepository);
     const timeEntryService = new TimeEntryService(timeEntryRepository, projectRepository);
+    const invoiceService = new InvoiceService(invoiceRepository, clientRepository);
 
     const userContext: UserRouterContext = { router, authProcedure, orgProcedure };
     const superadminContext: SuperadminRouterContext = { router, superadminProcedure };
@@ -76,6 +86,7 @@ export function buildApp({ db, auth }: AppDeps) {
         clients: clientUserRouter({ ...userContext, clientService }),
         projects: projectUserRouter({ ...userContext, projectService }),
         timeEntries: timeEntryUserRouter({ ...userContext, timeEntryService }),
+        invoices: invoiceUserRouter({ ...userContext, invoiceService }),
         superadmin: superadminUserRouter({
             ...superadminContext,
             organizationDirectoryRepository,
@@ -87,6 +98,7 @@ export function buildApp({ db, auth }: AppDeps) {
         userRouter,
         createContext,
         createUserCaller: t.createCallerFactory(userRouter),
+        services: { clients: clientService, invoices: invoiceService },
     };
 }
 

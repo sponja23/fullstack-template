@@ -1,6 +1,7 @@
 import { type QueryClient, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { type TRPCProxy, useTRPC, useTRPCClient } from "@/lib/trpc";
 import { ensureAPIQueryData, useAPIMutation } from "./api-queries";
+import type { ApiScope } from "../api-scopes";
 
 export function useApiKeys() {
     const trpc = useTRPC();
@@ -16,7 +17,8 @@ export function useIssueApiKey() {
     const client = useTRPCClient();
     const queryClient = useQueryClient();
     return useAPIMutation({
-        mutationFn: (vars: { name: string }) => client.apiKeys.issue.mutate(vars),
+        mutationFn: (vars: { name: string; scopes: ApiScope[] }) =>
+            client.apiKeys.issue.mutate(vars),
         onSuccess: () =>
             void queryClient.invalidateQueries({ queryKey: trpc.apiKeys.list.queryKey() }),
     });

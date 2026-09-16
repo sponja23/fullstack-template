@@ -1,0 +1,33 @@
+{
+  "name": "@repo/rest-api",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "@repo/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./test-support": "./src/test-support/harness.ts"
+  },
+  "scripts": {
+    "build": "vp build",
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "catalog:",
+    "@repo/backend": "workspace:*",
+    "@repo/logger": "workspace:*",
+    "@scalar/hono-api-reference": "catalog:",
+    "hono": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

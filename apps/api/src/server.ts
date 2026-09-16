@@ -1,8 +1,15 @@
 import { serve } from "@hono/node-server";
 import { trpcServer } from "@hono/trpc-server";
-import { LoggingEmailSender, buildApp, buildAuth, buildDb } from "@repo/backend";
+import {
+    LoggingEmailSender,
+    buildApp,
+    buildAuth,
+    buildDb,
+    scopesFromMetadata,
+} from "@repo/backend";
 import { USER_TRPC_PATH } from "@repo/client";
 import { logger } from "@repo/logger";
+import { buildRestApi } from "@repo/rest-api";
 import type { TelemetryTeardown } from "@repo/telemetry";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -20,7 +27,7 @@ export async function start(): Promise<TelemetryTeardown> {
         emailSender: new LoggingEmailSender(),
         cookieDomain: env.AUTH_COOKIE_DOMAIN,
     });
-    const { userRouter, createContext } = buildApp({ db, auth });
+    const { userRouter, createContext, services } = buildApp({ db, auth });
     const app = new Hono();
 
     app.use("*", loggingMiddleware);
@@ -32,6 +39,23 @@ export async function start(): Promise<TelemetryTeardown> {
             endpoint: USER_TRPC_PATH,
             router: userRouter,
             createContext: ({ req }) => createContext({ headers: req.headers }),
+        }),
+    );
+    app.route(
+        "/",
+        buildRestApi({
+            verifyApiKey: {
+                verify: async (rawKey) => {
+                    const result = await auth.api.verifyApiKey({ body: { key: rawKey } });
+                    if (!result.valid || !result.key) return null;
+                    return {
+                        organizationId: result.key.referenceId,
+                        scopes: new Set(scopesFromMetadata(result.key.metadata)),
+                    };
+                },
+            },
+            clients: services.clients,
+            invoices: services.invoices,
         }),
     );
     app.get("/", (context) => context.text("ok"));

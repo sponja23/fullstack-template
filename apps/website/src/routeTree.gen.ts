@@ -25,12 +25,16 @@ import { Route as AuthenticatedShellDashboardSettingsRouteRouteImport } from "./
 import { Route as AuthenticatedShellDashboardTimeIndexRouteImport } from "./routes/_authenticated/_shell/_dashboard/time/index"
 import { Route as AuthenticatedShellDashboardSettingsIndexRouteImport } from "./routes/_authenticated/_shell/_dashboard/settings/index"
 import { Route as AuthenticatedShellDashboardProjectsIndexRouteImport } from "./routes/_authenticated/_shell/_dashboard/projects/index"
+import { Route as AuthenticatedShellDashboardInvoicesIndexRouteImport } from "./routes/_authenticated/_shell/_dashboard/invoices/index"
 import { Route as AuthenticatedShellDashboardClientsIndexRouteImport } from "./routes/_authenticated/_shell/_dashboard/clients/index"
 import { Route as AuthenticatedShellDashboardSettingsMembersRouteImport } from "./routes/_authenticated/_shell/_dashboard/settings/members"
 import { Route as AuthenticatedShellDashboardSettingsGeneralRouteImport } from "./routes/_authenticated/_shell/_dashboard/settings/general"
 import { Route as AuthenticatedShellDashboardSettingsApiKeysRouteImport } from "./routes/_authenticated/_shell/_dashboard/settings/api-keys"
 import { Route as AuthenticatedShellDashboardProjectsProjectSlugRouteImport } from "./routes/_authenticated/_shell/_dashboard/projects/$projectSlug"
+import { Route as AuthenticatedShellDashboardInvoicesNewRouteImport } from "./routes/_authenticated/_shell/_dashboard/invoices/new"
+import { Route as AuthenticatedShellDashboardInvoicesInvoiceIdRouteImport } from "./routes/_authenticated/_shell/_dashboard/invoices/$invoiceId"
 import { Route as AuthenticatedShellDashboardClientsClientIdRouteImport } from "./routes/_authenticated/_shell/_dashboard/clients/$clientId"
+import { Route as AuthenticatedShellDashboardInvoicesInvoiceIdPrintRouteImport } from "./routes/_authenticated/_shell/_dashboard/invoices/$invoiceId.print"
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: "/_authenticated",
@@ -121,6 +125,12 @@ const AuthenticatedShellDashboardProjectsIndexRoute =
     path: "/projects/",
     getParentRoute: () => AuthenticatedShellDashboardRouteRoute,
   } as any)
+const AuthenticatedShellDashboardInvoicesIndexRoute =
+  AuthenticatedShellDashboardInvoicesIndexRouteImport.update({
+    id: "/invoices/",
+    path: "/invoices/",
+    getParentRoute: () => AuthenticatedShellDashboardRouteRoute,
+  } as any)
 const AuthenticatedShellDashboardClientsIndexRoute =
   AuthenticatedShellDashboardClientsIndexRouteImport.update({
     id: "/clients/",
@@ -151,11 +161,29 @@ const AuthenticatedShellDashboardProjectsProjectSlugRoute =
     path: "/projects/$projectSlug",
     getParentRoute: () => AuthenticatedShellDashboardRouteRoute,
   } as any)
+const AuthenticatedShellDashboardInvoicesNewRoute =
+  AuthenticatedShellDashboardInvoicesNewRouteImport.update({
+    id: "/invoices/new",
+    path: "/invoices/new",
+    getParentRoute: () => AuthenticatedShellDashboardRouteRoute,
+  } as any)
+const AuthenticatedShellDashboardInvoicesInvoiceIdRoute =
+  AuthenticatedShellDashboardInvoicesInvoiceIdRouteImport.update({
+    id: "/invoices/$invoiceId",
+    path: "/invoices/$invoiceId",
+    getParentRoute: () => AuthenticatedShellDashboardRouteRoute,
+  } as any)
 const AuthenticatedShellDashboardClientsClientIdRoute =
   AuthenticatedShellDashboardClientsClientIdRouteImport.update({
     id: "/clients/$clientId",
     path: "/clients/$clientId",
     getParentRoute: () => AuthenticatedShellDashboardRouteRoute,
+  } as any)
+const AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute =
+  AuthenticatedShellDashboardInvoicesInvoiceIdPrintRouteImport.update({
+    id: "/print",
+    path: "/print",
+    getParentRoute: () => AuthenticatedShellDashboardInvoicesInvoiceIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -170,14 +198,18 @@ export interface FileRoutesByFullPath {
   "/account/": typeof AuthenticatedShellAccountIndexRoute
   "/superadmin/": typeof AuthenticatedShellSuperadminIndexRoute
   "/clients/$clientId": typeof AuthenticatedShellDashboardClientsClientIdRoute
+  "/invoices/$invoiceId": typeof AuthenticatedShellDashboardInvoicesInvoiceIdRouteWithChildren
+  "/invoices/new": typeof AuthenticatedShellDashboardInvoicesNewRoute
   "/projects/$projectSlug": typeof AuthenticatedShellDashboardProjectsProjectSlugRoute
   "/settings/api-keys": typeof AuthenticatedShellDashboardSettingsApiKeysRoute
   "/settings/general": typeof AuthenticatedShellDashboardSettingsGeneralRoute
   "/settings/members": typeof AuthenticatedShellDashboardSettingsMembersRoute
   "/clients/": typeof AuthenticatedShellDashboardClientsIndexRoute
+  "/invoices/": typeof AuthenticatedShellDashboardInvoicesIndexRoute
   "/projects/": typeof AuthenticatedShellDashboardProjectsIndexRoute
   "/settings/": typeof AuthenticatedShellDashboardSettingsIndexRoute
   "/time/": typeof AuthenticatedShellDashboardTimeIndexRoute
+  "/invoices/$invoiceId/print": typeof AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute
 }
 export interface FileRoutesByTo {
   "/": typeof AuthenticatedShellDashboardIndexRoute
@@ -189,14 +221,18 @@ export interface FileRoutesByTo {
   "/account": typeof AuthenticatedShellAccountIndexRoute
   "/superadmin": typeof AuthenticatedShellSuperadminIndexRoute
   "/clients/$clientId": typeof AuthenticatedShellDashboardClientsClientIdRoute
+  "/invoices/$invoiceId": typeof AuthenticatedShellDashboardInvoicesInvoiceIdRouteWithChildren
+  "/invoices/new": typeof AuthenticatedShellDashboardInvoicesNewRoute
   "/projects/$projectSlug": typeof AuthenticatedShellDashboardProjectsProjectSlugRoute
   "/settings/api-keys": typeof AuthenticatedShellDashboardSettingsApiKeysRoute
   "/settings/general": typeof AuthenticatedShellDashboardSettingsGeneralRoute
   "/settings/members": typeof AuthenticatedShellDashboardSettingsMembersRoute
   "/clients": typeof AuthenticatedShellDashboardClientsIndexRoute
+  "/invoices": typeof AuthenticatedShellDashboardInvoicesIndexRoute
   "/projects": typeof AuthenticatedShellDashboardProjectsIndexRoute
   "/settings": typeof AuthenticatedShellDashboardSettingsIndexRoute
   "/time": typeof AuthenticatedShellDashboardTimeIndexRoute
+  "/invoices/$invoiceId/print": typeof AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -214,14 +250,18 @@ export interface FileRoutesById {
   "/_authenticated/_shell/account/": typeof AuthenticatedShellAccountIndexRoute
   "/_authenticated/_shell/superadmin/": typeof AuthenticatedShellSuperadminIndexRoute
   "/_authenticated/_shell/_dashboard/clients/$clientId": typeof AuthenticatedShellDashboardClientsClientIdRoute
+  "/_authenticated/_shell/_dashboard/invoices/$invoiceId": typeof AuthenticatedShellDashboardInvoicesInvoiceIdRouteWithChildren
+  "/_authenticated/_shell/_dashboard/invoices/new": typeof AuthenticatedShellDashboardInvoicesNewRoute
   "/_authenticated/_shell/_dashboard/projects/$projectSlug": typeof AuthenticatedShellDashboardProjectsProjectSlugRoute
   "/_authenticated/_shell/_dashboard/settings/api-keys": typeof AuthenticatedShellDashboardSettingsApiKeysRoute
   "/_authenticated/_shell/_dashboard/settings/general": typeof AuthenticatedShellDashboardSettingsGeneralRoute
   "/_authenticated/_shell/_dashboard/settings/members": typeof AuthenticatedShellDashboardSettingsMembersRoute
   "/_authenticated/_shell/_dashboard/clients/": typeof AuthenticatedShellDashboardClientsIndexRoute
+  "/_authenticated/_shell/_dashboard/invoices/": typeof AuthenticatedShellDashboardInvoicesIndexRoute
   "/_authenticated/_shell/_dashboard/projects/": typeof AuthenticatedShellDashboardProjectsIndexRoute
   "/_authenticated/_shell/_dashboard/settings/": typeof AuthenticatedShellDashboardSettingsIndexRoute
   "/_authenticated/_shell/_dashboard/time/": typeof AuthenticatedShellDashboardTimeIndexRoute
+  "/_authenticated/_shell/_dashboard/invoices/$invoiceId/print": typeof AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -237,14 +277,18 @@ export interface FileRouteTypes {
     | "/account/"
     | "/superadmin/"
     | "/clients/$clientId"
+    | "/invoices/$invoiceId"
+    | "/invoices/new"
     | "/projects/$projectSlug"
     | "/settings/api-keys"
     | "/settings/general"
     | "/settings/members"
     | "/clients/"
+    | "/invoices/"
     | "/projects/"
     | "/settings/"
     | "/time/"
+    | "/invoices/$invoiceId/print"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
@@ -256,14 +300,18 @@ export interface FileRouteTypes {
     | "/account"
     | "/superadmin"
     | "/clients/$clientId"
+    | "/invoices/$invoiceId"
+    | "/invoices/new"
     | "/projects/$projectSlug"
     | "/settings/api-keys"
     | "/settings/general"
     | "/settings/members"
     | "/clients"
+    | "/invoices"
     | "/projects"
     | "/settings"
     | "/time"
+    | "/invoices/$invoiceId/print"
   id:
     | "__root__"
     | "/_authenticated"
@@ -280,14 +328,18 @@ export interface FileRouteTypes {
     | "/_authenticated/_shell/account/"
     | "/_authenticated/_shell/superadmin/"
     | "/_authenticated/_shell/_dashboard/clients/$clientId"
+    | "/_authenticated/_shell/_dashboard/invoices/$invoiceId"
+    | "/_authenticated/_shell/_dashboard/invoices/new"
     | "/_authenticated/_shell/_dashboard/projects/$projectSlug"
     | "/_authenticated/_shell/_dashboard/settings/api-keys"
     | "/_authenticated/_shell/_dashboard/settings/general"
     | "/_authenticated/_shell/_dashboard/settings/members"
     | "/_authenticated/_shell/_dashboard/clients/"
+    | "/_authenticated/_shell/_dashboard/invoices/"
     | "/_authenticated/_shell/_dashboard/projects/"
     | "/_authenticated/_shell/_dashboard/settings/"
     | "/_authenticated/_shell/_dashboard/time/"
+    | "/_authenticated/_shell/_dashboard/invoices/$invoiceId/print"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -410,6 +462,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedShellDashboardProjectsIndexRouteImport
       parentRoute: typeof AuthenticatedShellDashboardRouteRoute
     }
+    "/_authenticated/_shell/_dashboard/invoices/": {
+      id: "/_authenticated/_shell/_dashboard/invoices/"
+      path: "/invoices"
+      fullPath: "/invoices/"
+      preLoaderRoute: typeof AuthenticatedShellDashboardInvoicesIndexRouteImport
+      parentRoute: typeof AuthenticatedShellDashboardRouteRoute
+    }
     "/_authenticated/_shell/_dashboard/clients/": {
       id: "/_authenticated/_shell/_dashboard/clients/"
       path: "/clients"
@@ -445,12 +504,33 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedShellDashboardProjectsProjectSlugRouteImport
       parentRoute: typeof AuthenticatedShellDashboardRouteRoute
     }
+    "/_authenticated/_shell/_dashboard/invoices/new": {
+      id: "/_authenticated/_shell/_dashboard/invoices/new"
+      path: "/invoices/new"
+      fullPath: "/invoices/new"
+      preLoaderRoute: typeof AuthenticatedShellDashboardInvoicesNewRouteImport
+      parentRoute: typeof AuthenticatedShellDashboardRouteRoute
+    }
+    "/_authenticated/_shell/_dashboard/invoices/$invoiceId": {
+      id: "/_authenticated/_shell/_dashboard/invoices/$invoiceId"
+      path: "/invoices/$invoiceId"
+      fullPath: "/invoices/$invoiceId"
+      preLoaderRoute: typeof AuthenticatedShellDashboardInvoicesInvoiceIdRouteImport
+      parentRoute: typeof AuthenticatedShellDashboardRouteRoute
+    }
     "/_authenticated/_shell/_dashboard/clients/$clientId": {
       id: "/_authenticated/_shell/_dashboard/clients/$clientId"
       path: "/clients/$clientId"
       fullPath: "/clients/$clientId"
       preLoaderRoute: typeof AuthenticatedShellDashboardClientsClientIdRouteImport
       parentRoute: typeof AuthenticatedShellDashboardRouteRoute
+    }
+    "/_authenticated/_shell/_dashboard/invoices/$invoiceId/print": {
+      id: "/_authenticated/_shell/_dashboard/invoices/$invoiceId/print"
+      path: "/print"
+      fullPath: "/invoices/$invoiceId/print"
+      preLoaderRoute: typeof AuthenticatedShellDashboardInvoicesInvoiceIdPrintRouteImport
+      parentRoute: typeof AuthenticatedShellDashboardInvoicesInvoiceIdRoute
     }
   }
 }
@@ -479,12 +559,30 @@ const AuthenticatedShellDashboardSettingsRouteRouteWithChildren =
     AuthenticatedShellDashboardSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedShellDashboardInvoicesInvoiceIdRouteChildren {
+  AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute: typeof AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute
+}
+
+const AuthenticatedShellDashboardInvoicesInvoiceIdRouteChildren: AuthenticatedShellDashboardInvoicesInvoiceIdRouteChildren =
+  {
+    AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute:
+      AuthenticatedShellDashboardInvoicesInvoiceIdPrintRoute,
+  }
+
+const AuthenticatedShellDashboardInvoicesInvoiceIdRouteWithChildren =
+  AuthenticatedShellDashboardInvoicesInvoiceIdRoute._addFileChildren(
+    AuthenticatedShellDashboardInvoicesInvoiceIdRouteChildren,
+  )
+
 interface AuthenticatedShellDashboardRouteRouteChildren {
   AuthenticatedShellDashboardSettingsRouteRoute: typeof AuthenticatedShellDashboardSettingsRouteRouteWithChildren
   AuthenticatedShellDashboardIndexRoute: typeof AuthenticatedShellDashboardIndexRoute
   AuthenticatedShellDashboardClientsClientIdRoute: typeof AuthenticatedShellDashboardClientsClientIdRoute
+  AuthenticatedShellDashboardInvoicesInvoiceIdRoute: typeof AuthenticatedShellDashboardInvoicesInvoiceIdRouteWithChildren
+  AuthenticatedShellDashboardInvoicesNewRoute: typeof AuthenticatedShellDashboardInvoicesNewRoute
   AuthenticatedShellDashboardProjectsProjectSlugRoute: typeof AuthenticatedShellDashboardProjectsProjectSlugRoute
   AuthenticatedShellDashboardClientsIndexRoute: typeof AuthenticatedShellDashboardClientsIndexRoute
+  AuthenticatedShellDashboardInvoicesIndexRoute: typeof AuthenticatedShellDashboardInvoicesIndexRoute
   AuthenticatedShellDashboardProjectsIndexRoute: typeof AuthenticatedShellDashboardProjectsIndexRoute
   AuthenticatedShellDashboardTimeIndexRoute: typeof AuthenticatedShellDashboardTimeIndexRoute
 }
@@ -497,10 +595,16 @@ const AuthenticatedShellDashboardRouteRouteChildren: AuthenticatedShellDashboard
       AuthenticatedShellDashboardIndexRoute,
     AuthenticatedShellDashboardClientsClientIdRoute:
       AuthenticatedShellDashboardClientsClientIdRoute,
+    AuthenticatedShellDashboardInvoicesInvoiceIdRoute:
+      AuthenticatedShellDashboardInvoicesInvoiceIdRouteWithChildren,
+    AuthenticatedShellDashboardInvoicesNewRoute:
+      AuthenticatedShellDashboardInvoicesNewRoute,
     AuthenticatedShellDashboardProjectsProjectSlugRoute:
       AuthenticatedShellDashboardProjectsProjectSlugRoute,
     AuthenticatedShellDashboardClientsIndexRoute:
       AuthenticatedShellDashboardClientsIndexRoute,
+    AuthenticatedShellDashboardInvoicesIndexRoute:
+      AuthenticatedShellDashboardInvoicesIndexRoute,
     AuthenticatedShellDashboardProjectsIndexRoute:
       AuthenticatedShellDashboardProjectsIndexRoute,
     AuthenticatedShellDashboardTimeIndexRoute:

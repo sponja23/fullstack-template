@@ -23,3 +23,19 @@ _Avoid_: job, engagement.
 A positive number of minutes worked by an Organization member on a Project on a particular date, optionally described by a note. It is unbilled until an invoice line item claims it; a billed Time entry is immutable.
 
 _Avoid_: timesheet, log.
+
+## Invoice
+
+An Organization's bill to one Client. It begins as an editable draft with no number; issuing assigns
+the next gapless Organization number and claims its Time entries atomically. Its lifecycle is draft →
+issued → paid, draft → void, or issued → void, with timestamps recording each transition.
+
+_Avoid_: bill.
+
+## Line item
+
+A child of an Invoice carrying an integer quantity, unit amount, and total in the Invoice currency. A
+generated Line item groups selected Time entries for one Project using minutes and its hourly rate; a
+manual Line item is entered directly. Line items are never accessed independently of their Invoice.
+
+_Avoid_: line, row, item.

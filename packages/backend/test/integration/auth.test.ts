@@ -40,7 +40,10 @@ apiTestSuite({
         });
 
         test("mints and verifies an organization API key", async ({ harness, request }) => {
-            const issued = await request.apiKeys.issue({ name: "integration" });
+            const issued = await request.apiKeys.issue({
+                name: "integration",
+                scopes: ["clients:read"],
+            });
             const verified = await harness.auth.api.verifyApiKey({ body: { key: issued.key } });
             expect(verified.valid).toBe(true);
             expect(verified.key?.referenceId).toBe(harness.organizationId);

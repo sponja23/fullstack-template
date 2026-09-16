@@ -180,6 +180,72 @@ const entries = [
     },
 ] satisfies Outputs["timeEntries"]["listMine"];
 
+const invoiceLines = [
+    {
+        id: "40000000-0000-4000-8000-000000000001",
+        invoiceId: "50000000-0000-4000-8000-000000000002",
+        projectId: projects[0].id,
+        kind: "generated" as const,
+        description: projects[0].name,
+        quantity: 120,
+        unitAmountMinor: projects[0].rateMinor,
+        totalMinor: 30_000,
+        sourceEntryIds: [entries[1].id],
+        createdAt: EPOCH,
+    },
+];
+const invoices = [
+    {
+        id: "50000000-0000-4000-8000-000000000001",
+        number: null,
+        status: "draft" as const,
+        issuedAt: null,
+        paidAt: null,
+        voidedAt: null,
+    },
+    {
+        id: "50000000-0000-4000-8000-000000000002",
+        number: 1,
+        status: "issued" as const,
+        issuedAt: EPOCH,
+        paidAt: null,
+        voidedAt: null,
+    },
+    {
+        id: "50000000-0000-4000-8000-000000000003",
+        number: 2,
+        status: "paid" as const,
+        issuedAt: EPOCH,
+        paidAt: EPOCH,
+        voidedAt: null,
+    },
+    {
+        id: "50000000-0000-4000-8000-000000000004",
+        number: 3,
+        status: "void" as const,
+        issuedAt: EPOCH,
+        paidAt: null,
+        voidedAt: EPOCH,
+    },
+].map((value) => ({
+    ...value,
+    organizationId: organization.id,
+    clientId: clients[0].id,
+    clientName: clients[0].name,
+    billingEmail: clients[0].billingEmail,
+    currency: clients[0].currency,
+    createdAt: EPOCH,
+    updatedAt: EPOCH,
+    totalMinor: value.status === "draft" ? 0 : 30_000,
+}));
+const invoiceDetails = invoices.map(({ totalMinor: _totalMinor, ...invoice }) => ({
+    ...invoice,
+    lineItems:
+        invoice.status === "draft"
+            ? []
+            : invoiceLines.map((line) => ({ ...line, invoiceId: invoice.id })),
+}));
+
 function queries(
     members: readonly unknown[],
     invitations: readonly unknown[],
@@ -233,12 +299,28 @@ const acmeAgency: World = {
                 (entry) => entry.projectId === (input as { projectId: string }).projectId,
             ),
         "timeEntries.listMine": () => entries.filter((entry) => entry.authorId === owner.id),
+        "invoices.list": () => invoices,
+        "invoices.get": (input) =>
+            invoiceDetails.find((invoice) => invoice.id === (input as { id: string }).id) ??
+            invoiceDetails[1],
+        "invoices.listUnbilledEntries": () => [
+            {
+                id: entries[0].id,
+                projectId: projects[0].id,
+                projectName: projects[0].name,
+                rateMinor: projects[0].rateMinor,
+                date: entries[0].date,
+                minutes: entries[0].minutes,
+                note: entries[0].note,
+            },
+        ],
         "apiKeys.list": () => ({
             apiKeys: [
                 {
                     id: "key_ci",
                     name: "CI",
                     start: "acme_12ab",
+                    scopes: ["clients:read" as const, "invoices:read" as const],
                     createdAt: EPOCH,
                     lastRequest: null,
                 },
@@ -279,6 +361,7 @@ const emptyOrg: World = {
         "clients.list": () => [],
         "projects.list": () => [],
         "timeEntries.listMine": () => [],
+        "invoices.list": () => [],
         "apiKeys.list": () => ({ apiKeys: [] }),
         "superadmin.organizations.list": () => [],
     },
