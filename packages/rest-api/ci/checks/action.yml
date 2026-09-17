@@ -1,0 +1,14 @@
+name: Checks for @repo/rest-api
+description: Run static checks and tests.
+runs:
+  using: composite
+  steps:
+    - name: Static checks
+      shell: bash
+      working-directory: packages/rest-api
+      run: pnpm exec vp check --no-error-on-unmatched-pattern .
+    - name: Test
+      if: ${{ !cancelled() }}
+      shell: bash
+      working-directory: packages/rest-api
+      run: pnpm exec vp test run

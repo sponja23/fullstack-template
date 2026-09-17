@@ -1,0 +1,19 @@
+name: Checks for @repo/storybook
+description: Run static checks and both story smoke suites.
+runs:
+  using: composite
+  steps:
+    - name: Static checks
+      shell: bash
+      working-directory: tools/storybook
+      run: pnpm exec vp check --no-error-on-unmatched-pattern .
+    - name: Story smoke
+      if: ${{ !cancelled() }}
+      shell: bash
+      working-directory: tools/storybook
+      run: pnpm exec vp test run
+    - name: Browser smoke
+      if: ${{ !cancelled() }}
+      shell: bash
+      working-directory: tools/storybook
+      run: pnpm test:browser

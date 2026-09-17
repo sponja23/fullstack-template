@@ -44,7 +44,7 @@ blank page or framework screen as product UI.
 ## Worlds
 
 World handlers are typed from `inferRouterOutputs<UserAppRouter>` so fixtures cannot
-drift from the backend contract. Add a world for recurring scenarios and override a
+drift from the backend contract. Add a world for recurring situations and override a
 single handler for one-off axes. A loading handler returns a never-resolving promise;
 an error handler throws.
 
