@@ -1,6 +1,6 @@
 # Triage Labels
 
-The skills use five canonical triage roles. All five exist as GitHub labels on `sponja23/acme`.
+The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repository's issue tracker. All five exist as GitHub labels on `sponja23/acme`.
 
 | Canonical role    | Label in our tracker | Meaning                                  |
 | ----------------- | -------------------- | ---------------------------------------- |
@@ -10,4 +10,8 @@ The skills use five canonical triage roles. All five exist as GitHub labels on `
 | `ready-for-human` | `ready-for-human`    | Requires human implementation            |
 | `wontfix`         | `wontfix`            | Will not be actioned                     |
 
-These labels describe triage state and are independent of classification labels such as `bug`, `feature`, or `refactor`.
+When a skill mentions a role, use the corresponding label string from this table.
+
+These five labels track an issue's triage state. They are orthogonal to the `bug`, `feature`, and `refactor` classification labels, which describe the kind of work.
+
+Edit the right-hand column to match the vocabulary in the issue tracker.

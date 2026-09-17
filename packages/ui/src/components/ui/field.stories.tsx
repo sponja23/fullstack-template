@@ -23,7 +23,7 @@ export const Form: Story = {
             <FieldGroup>
                 <Field>
                     <FieldLabel htmlFor="field-name">Name</FieldLabel>
-                    <Input id="field-name" defaultValue="Acme Inc." />
+                    <Input id="field-name" defaultValue="Northstar Studio" />
                     <FieldDescription>Shown on invoices and receipts.</FieldDescription>
                 </Field>
                 <Field data-invalid="true">

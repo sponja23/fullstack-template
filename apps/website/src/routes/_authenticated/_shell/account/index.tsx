@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, User } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@repo/ui/sidebar";
-import { FormError } from "@/components/form/form.error";
+import { FormError } from "@/components/form/form-error";
 import { RouteError, RoutePending } from "@/components/layout/route-state";
 import { SectionHeader } from "@/components/shell/section-header";
 import { useUser } from "@/lib/queries/auth.queries";
@@ -12,7 +12,7 @@ import {
     useDisplayNameFormContext,
     usePasswordForm,
     usePasswordFormContext,
-} from "./-components/account.forms";
+} from "./-components/account.form";
 
 export const Route = createFileRoute("/_authenticated/_shell/account/")({
     loader: () => null,

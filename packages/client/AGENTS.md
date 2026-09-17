@@ -14,7 +14,7 @@ When adding a principal, build its link, hand it to `super`, add its auth-specif
 
 ## Error mapping
 
-`errorMapper` translates an outgoing tRPC error before the caller's `await` rejects with it. `errorMappingLink` applies it to every operation: return the input unchanged to leave the error alone, or return a different value to substitute it.
+`errorMapper` translates an outgoing tRPC error before the caller's `await` rejects with it. `errorMappingLink` applies it to every operation: return the input unchanged to leave the error alone, or return a different value to substitute it. The link casts to widen the observer's `TRPCClientError` type to the mapper's arbitrary return, since the result is rethrown verbatim.
 
 ## Paths
 

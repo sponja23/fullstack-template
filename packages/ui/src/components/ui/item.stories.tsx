@@ -24,8 +24,8 @@ export const Variants: Story = {
                         <Building2Icon />
                     </ItemMedia>
                     <ItemContent>
-                        <ItemTitle>Acme Inc.</ItemTitle>
-                        <ItemDescription>billing@acme.test · 12 invoices</ItemDescription>
+                        <ItemTitle>Northstar Studio</ItemTitle>
+                        <ItemDescription>billing@example.test · 12 invoices</ItemDescription>
                     </ItemContent>
                     <ItemActions>
                         <Button size="xs" variant="outline">

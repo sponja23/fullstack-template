@@ -3,7 +3,7 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import type { BackendErrorCode, UserAppRouter } from "@repo/client";
 import { SelectField } from "@/components/form/select.field";
-import { SubmitButton } from "@/components/form/submit.button";
+import { SubmitButton } from "@/components/form/submit-button";
 import { TextField } from "@/components/form/text.field";
 import { TextareaField } from "@/components/form/textarea.field";
 import type { authClient } from "@/lib/auth";

@@ -5,7 +5,7 @@ import { RouteError, RoutePending } from "@/components/layout/route-state";
 import { ensureActiveOrganizationId } from "@/lib/queries/auth.queries";
 import { ensureProjectsData, useProjects } from "@/lib/queries/projects.queries";
 import { ensureMyTimeEntriesData, useMyTimeEntries } from "@/lib/queries/time-entries.queries";
-import { CreateTimeEntryForm } from "./-components/time-entry.forms";
+import { CreateTimeEntryForm } from "./-components/time-entry-forms";
 
 export const Route = createFileRoute("/_authenticated/_shell/_dashboard/time/")({
     loader: async ({ context }) => {

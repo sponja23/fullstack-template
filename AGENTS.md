@@ -41,15 +41,15 @@ vp build
 
 ### Type safety
 
-Schemas are the source of truth at boundaries. Anything crossing a process, network, or storage edge is defined as a Zod schema; derive the runtime type with `z.infer`.
+Schemas are the source of truth at boundaries. Anything crossing a process, network, or storage edge is defined as a Zod schema; the runtime type is derived via `z.infer`. Don't hand-write a parallel type next to a schema.
 
-Make illegal states unrepresentable: prefer discriminated unions over flag booleans and handle unions exhaustively.
+Make illegal states unrepresentable: prefer discriminated unions over flag booleans, and handle the union exhaustively at the consumer.
 
-`any`, `!`, and `as` are escape hatches. Use them only when the alternative is worse.
+`any`, `!`, and `as` are escape hatches — discouraged by default but acceptable when the alternative is worse. Use judgment.
 
 ### Dependency injection
 
-Construct dependency graphs at startup. Components receive dependencies through constructor parameters. Keep module-level singletons and hidden global state out of application code.
+Construct dependency graphs at startup. Components receive their dependencies via constructor parameters. No module-level singletons or hidden global state unless explicitly instructed by the user.
 
 Environment variables are read only during dependency construction. Internal code accesses configuration through injected dependencies, never through `process.env`.
 
@@ -65,23 +65,26 @@ Avoid tests that mock internal collaborators and assert call shapes. Those tests
 
 The logger is the one exception to dependency injection. Import the global logger from `@repo/logger` and create a child with a descriptive name at module or class scope.
 
-Log enough context to debug behavior. Default to `info`; reserve `debug` for noisy or temporary instrumentation.
+Log aggressively to make debugging easy. Default to `info`; reserve `debug` for logs that would otherwise be too noisy, or for temporary instrumentation added for a specific investigation.
 
 ### Comments
 
 Comments carry what code cannot: the reason behind a non-obvious decision, an invariant, an ordering constraint, or a gotcha. They must stand alone for a reader with no history of the change.
 
-Keep them short. A doc comment gets one sentence by default. Longer design reasoning belongs in one of three homes:
+Keep them short. A doc comment gets one sentence by default; a second is warranted only to name an invariant a reader could plausibly break by editing this code. Anything longer is design reasoning and moves to the home that fits:
 
 - an area convention a future author must follow → the nearest `AGENTS.md`;
 - a cross-cutting structure or build rule → the matching skill under `.agents/skills/`;
 - a design decision and alternatives → an entry under `docs/adr/`.
+- a genuinely breakable invariant on this code → it stays inline, trimmed to the constraint.
 
-Do not write ghost comments about prior implementations, refactors, reviews, or plans. Do not restate code or leave commented-out code.
+Never write ghost comments: references to prior implementation ("previously…", "no longer…", "used to…"), a refactor, a PR, a plan, or review feedback. State only what is true now. Don't restate code, echo the signature, or leave commented-out code behind.
 
-Open work may name a ticket only as `// TODO -- <description> (#XXX)`. Implementing the issue removes the comment.
+Work an open issue will do is the one thing inline may name a ticket, exactly as `// TODO -- <description> (#XXX)`. The named issue deletes the comment. A TODO with no issue, or naming a closed one, is a ghost comment by another name.
 
-Repository instructions live in directory-scoped `AGENTS.md` files. Sibling `CLAUDE.md` files are compatibility symlinks. Read the instruction chain from the root through a path before editing; the nearest file wins.
+Don't re-explain at a consumer what its source already documents. State only what the code at hand adds; copy shared explanations into one canonical home rather than sibling files.
+
+Repository instructions live in directory-scoped `AGENTS.md` files. Sibling `CLAUDE.md` files are compatibility symlinks. Before designing, planning, or editing a path, read the instruction chain from the root through that path; the nearest file wins. Cross-cutting structure and build conventions live in the matching skill; design decisions and their alternatives live in `docs/adr/`.
 
 ## Agent skills
 

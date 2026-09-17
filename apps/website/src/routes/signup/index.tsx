@@ -1,9 +1,9 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { z } from "zod";
-import { FormError } from "@/components/form/form.error";
-import { CenteredContainer } from "@/components/layout/centered.container";
-import { CenteredScreen } from "@/components/layout/centered.screen";
+import { FormError } from "@/components/form/form-error";
+import { CenteredContainer } from "@/components/layout/centered-container";
+import { CenteredScreen } from "@/components/layout/centered-screen";
 import { RouteError, RoutePending } from "@/components/layout/route-state";
 import { useSignupForm, useSignupFormContext } from "./-components/signup.form";
 

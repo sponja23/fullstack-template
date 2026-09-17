@@ -13,7 +13,7 @@ export const ClientPreview: Story = {
         <div className="flex min-h-40 items-start justify-center">
             <HoverCard defaultOpen>
                 <HoverCardTrigger className="text-sm underline underline-offset-4">
-                    Acme Inc.
+                    Northstar Studio
                 </HoverCardTrigger>
                 <HoverCardContent>
                     <div className="flex gap-3">
@@ -21,7 +21,7 @@ export const ClientPreview: Story = {
                             <AvatarFallback>AI</AvatarFallback>
                         </Avatar>
                         <div>
-                            <div className="font-medium">Acme Inc.</div>
+                            <div className="font-medium">Northstar Studio</div>
                             <div className="text-muted-foreground">
                                 12 invoices · $48,200 billed
                             </div>

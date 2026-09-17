@@ -37,7 +37,7 @@ export const Palette: Story = {
                 <CommandGroup heading="Clients">
                     <CommandItem>
                         <UserIcon />
-                        Open Acme Inc.
+                        Open Northstar Studio
                     </CommandItem>
                 </CommandGroup>
             </CommandList>

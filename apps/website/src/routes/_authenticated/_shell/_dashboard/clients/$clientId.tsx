@@ -7,7 +7,7 @@ import { RouteError, RoutePending } from "@/components/layout/route-state";
 import { ensureActiveOrganizationId } from "@/lib/queries/auth.queries";
 import { ensureClientData, useArchiveClient, useClient } from "@/lib/queries/clients.queries";
 import { ensureProjectsData, useProjects } from "@/lib/queries/projects.queries";
-import { EditClientForm } from "./-components/client.forms";
+import { EditClientForm } from "./-components/client-forms";
 
 export const Route = createFileRoute("/_authenticated/_shell/_dashboard/clients/$clientId")({
     loader: async ({ context, params }) => {

@@ -1,15 +1,11 @@
 # @repo/storybook
 
-This `tools/` dependency sink renders `@repo/ui` primitives and website routes
-without a development server or backend. Load the `storybook` skill when changing
-stories, worlds, or the catalog harness.
+A `tools/` catalog that renders `@repo/ui` primitives and website routes with no development server or backend. Authoring stories is covered by the `storybook` skill; this note holds the harness rationale a change must not lose.
 
-`src/fake-trpc.ts` terminates a real `TRPCClient<UserAppRouter>` with fixture
-handlers. `src/fake-auth.ts` pins the mirrored auth-session query in React Query so
-it cannot refetch through the real auth client. `src/story-env.tsx` combines those
-fixtures per story; once the website package exists it should reuse the website's
-own tRPC context so product hooks and the fake client share one provider.
+## Faking the website's data layer
 
-The preview follows `prefers-color-scheme` and listens for OS changes. Keep the
-jsdom smoke for fast feedback and the Chromium smoke for portal, layout, and route
-runtime coverage.
+`createFakeUserClient` in `src/fake-trpc.ts` builds a real `TRPCClient<UserAppRouter>` whose only fake is its terminating link: it resolves each operation from a handlers map instead of dialing the backend. The proxy, query and mutation dispatch, and error wrapping remain genuine, so website hooks behave as they do against the live API. `src/story-env.tsx` mounts it through the website's own `TRPCProvider`, so product `useTRPC()` hooks read the fake client.
+
+`src/fake-auth.ts` seeds session data into the Query cache rather than importing the real auth client, which would load validated environment configuration. Keep the hand-mirrored `SESSION_QUERY_KEY` and the `staleTime`/`gcTime: Infinity` pin in `seedSession`; the inline comments at those sites document the invariants.
+
+The preview follows `prefers-color-scheme` and listens for operating-system changes. Keep the jsdom smoke for fast feedback and Chromium for portal, layout, and route runtime coverage.

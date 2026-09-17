@@ -28,7 +28,7 @@ export const Default: Story = {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Acme Inc.</BreadcrumbPage>
+                    <BreadcrumbPage>Northstar Studio</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

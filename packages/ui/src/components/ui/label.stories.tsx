@@ -12,7 +12,7 @@ export const WithInput: Story = {
     render: () => (
         <div className="grid w-80 gap-1.5">
             <Label htmlFor="company">Company name</Label>
-            <Input id="company" defaultValue="Acme Inc." />
+            <Input id="company" defaultValue="Northstar Studio" />
         </div>
     ),
 };

@@ -4,7 +4,7 @@ import { Button } from "@repo/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/select";
 import { z } from "zod";
-import { FormError } from "@/components/form/form.error";
+import { FormError } from "@/components/form/form-error";
 import {
     type FormErrorConfig,
     formOptions,

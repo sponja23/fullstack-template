@@ -14,8 +14,8 @@ import {
     useDeleteTimeEntry,
     useProjectTimeEntries,
 } from "@/lib/queries/time-entries.queries";
-import { EditProjectForm } from "./-components/project.forms";
-import { CreateTimeEntryForm, EditTimeEntryForm } from "../time/-components/time-entry.forms";
+import { EditProjectForm } from "./-components/project-forms";
+import { CreateTimeEntryForm, EditTimeEntryForm } from "../time/-components/time-entry-forms";
 
 export const Route = createFileRoute("/_authenticated/_shell/_dashboard/projects/$projectSlug")({
     loader: async ({ context, params }) => {

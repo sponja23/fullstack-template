@@ -6,6 +6,14 @@ This package is the leaf of the dependency graph: it has zero dependencies and e
 
 ## Adding to this package requires explicit user sign-off
 
-Consult the user before adding an export, dependency, changed signature, or widened contract. Exhaust co-location with one consumer and a named domain package for related consumers before proposing an addition here.
+This is a reluctant home, and the discipline is the point: consult the user explicitly before extending it with an export, dependency, changed signature, or widened contract. Do not add to it as a by-the-way step of another task.
 
-`errMessage(unknown): string` earns its place because it recurs across unrelated packages: it returns an `Error`'s message or the value's string representation. It does not log.
+Before proposing an addition, exhaust the alternatives:
+
+- One consumer → co-locate it there.
+- A few related consumers → use a named domain package.
+- Genuinely general, needed by unrelated consumers, and with no natural owner → propose it here only after the user agrees.
+
+## Contents
+
+- `errMessage(unknown): string` earns its place because it recurs across unrelated packages: it returns an `Error`'s message or the value's string representation. It does not log; logging a caught value goes directly to `@repo/logger`.

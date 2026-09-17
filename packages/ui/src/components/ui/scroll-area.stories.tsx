@@ -15,7 +15,7 @@ export const InvoiceHistory: Story = {
                     <div key={index} className="border-b pb-2 text-sm">
                         <div className="font-medium">INV-{1042 - index}</div>
                         <div className="text-muted-foreground">
-                            Acme Inc. · ${(1200 + index * 175).toLocaleString()}
+                            Northstar Studio · ${(1200 + index * 175).toLocaleString()}
                         </div>
                     </div>
                 ))}

@@ -16,7 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { RouteError, RoutePending } from "@/components/layout/route-state";
 import { ensureActiveOrganizationId } from "@/lib/queries/auth.queries";
 import { ensureClientsData, useClients } from "@/lib/queries/clients.queries";
-import { CreateClientForm } from "./-components/client.forms";
+import { CreateClientForm } from "./-components/client-forms";
 
 export const Route = createFileRoute("/_authenticated/_shell/_dashboard/clients/")({
     loader: async ({ context }) => {

@@ -13,7 +13,7 @@ function Showcase() {
     useEffect(() => {
         const success = toast.add({
             title: "Invoice sent",
-            description: "INV-1042 was emailed to Acme Inc.",
+            description: "INV-1042 was emailed to Northstar Studio.",
             type: "success",
             timeout: 0,
         });

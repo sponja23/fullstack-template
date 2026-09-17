@@ -4,7 +4,7 @@ Components never call `trpc.*` directly. Every remote interaction is exposed fro
 
 ## Reads
 
-A loader-backed read is a triad: one private query-options builder, one reactive hook, and one loader-side `ensure*Data` helper warming the same cache. Prefer `useSuspenseQuery` for page data and prefetch it through `ensureAPIQueryData`; that helper maps tRPC 404 responses to the router's not-found boundary.
+A loader-backed read is a triad: one private query-options builder, one reactive hook, and one loader-side `ensure*Data` helper warming the same cache. The `ensure*Data` member exists only for reads a route loader actually prefetches; a live-only read that no `beforeLoad` or `loader` warms omits it rather than shipping an ensure with no caller. Prefer `useSuspenseQuery` for page data and prefetch it through `ensureAPIQueryData`; that helper maps tRPC 404 responses to the router's not-found boundary.
 
 Organization-scoped cache keys include `organizationId`. Active organization state comes from the session rather than a second local copy. Reads without an active organization are disabled and resolve to `null`.
 

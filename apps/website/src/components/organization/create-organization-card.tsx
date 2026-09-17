@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
-import { FormError } from "@/components/form/form.error";
+import { FormError } from "@/components/form/form-error";
 import { slugify } from "@/lib/slug";
 import {
     useCreateOrganizationForm,

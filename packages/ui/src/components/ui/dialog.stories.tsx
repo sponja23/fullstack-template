@@ -29,7 +29,7 @@ export const EditClient: Story = {
                         Update the client name used on future invoices.
                     </DialogDescription>
                 </DialogHeader>
-                <Input defaultValue="Acme Inc." />
+                <Input defaultValue="Northstar Studio" />
                 <DialogFooter>
                     <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
                     <DialogClose render={<Button />}>Save</DialogClose>

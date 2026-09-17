@@ -18,7 +18,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const invoices = [
-    { number: "INV-1042", client: "Acme Inc.", total: "$4,280", status: "Issued" },
+    { number: "INV-1042", client: "Northstar Studio", total: "$4,280", status: "Issued" },
     { number: "INV-1041", client: "Globex", total: "$1,950", status: "Paid" },
 ];
 export const InvoiceList: Story = {

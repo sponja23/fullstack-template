@@ -20,7 +20,7 @@ import {
 } from "@repo/ui/dialog";
 import { Input } from "@repo/ui/input";
 import { z } from "zod";
-import { FormError } from "@/components/form/form.error";
+import { FormError } from "@/components/form/form-error";
 import {
     type FormErrorConfig,
     formOptions,

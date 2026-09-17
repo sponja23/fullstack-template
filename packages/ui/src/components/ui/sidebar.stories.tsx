@@ -33,7 +33,7 @@ export const ApplicationShell: Story = {
         <SidebarProvider>
             <Sidebar collapsible="icon">
                 <SidebarHeader>
-                    <span className="px-2 font-heading text-sm font-medium">Acme</span>
+                    <span className="px-2 font-heading text-sm font-medium">Demo</span>
                 </SidebarHeader>
                 <SidebarContent>
                     <SidebarGroup>

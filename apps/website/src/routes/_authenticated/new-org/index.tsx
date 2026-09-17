@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { CenteredContainer } from "@/components/layout/centered.container";
+import { CenteredContainer } from "@/components/layout/centered-container";
 import { RouteError, RoutePending } from "@/components/layout/route-state";
-import { CreateOrganizationCard } from "@/components/organization/create-organization.card";
+import { CreateOrganizationCard } from "@/components/organization/create-organization-card";
 
 export const Route = createFileRoute("/_authenticated/new-org/")({
     validateSearch: z.object({ redirect: z.string().optional() }),

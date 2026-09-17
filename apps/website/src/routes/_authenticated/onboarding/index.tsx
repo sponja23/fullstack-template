@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@repo/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { z } from "zod";
-import { CenteredContainer } from "@/components/layout/centered.container";
+import { CenteredContainer } from "@/components/layout/centered-container";
 import { RouteError, RoutePending } from "@/components/layout/route-state";
-import { CreateOrganizationCard } from "@/components/organization/create-organization.card";
-import { UserInvitationsCard } from "@/components/organization/user-invitations.card";
+import { CreateOrganizationCard } from "@/components/organization/create-organization-card";
+import { UserInvitationsCard } from "@/components/organization/user-invitations-card";
 import {
     ensureOrganizationsData,
     ensureUserInvitationsData,

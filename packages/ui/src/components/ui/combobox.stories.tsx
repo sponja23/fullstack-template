@@ -17,12 +17,12 @@ type Story = StoryObj<typeof meta>;
 export const Clients: Story = {
     render: () => (
         <div className="min-h-48">
-            <Combobox defaultOpen defaultValue="acme">
+            <Combobox defaultOpen defaultValue="northstar">
                 <ComboboxInput placeholder="Choose a client" />
                 <ComboboxContent>
                     <ComboboxEmpty>No client found.</ComboboxEmpty>
                     <ComboboxList>
-                        <ComboboxItem value="acme">Acme Inc.</ComboboxItem>
+                        <ComboboxItem value="northstar">Northstar Studio</ComboboxItem>
                         <ComboboxItem value="globex">Globex</ComboboxItem>
                         <ComboboxItem value="initech">Initech</ComboboxItem>
                     </ComboboxList>

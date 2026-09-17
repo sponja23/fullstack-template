@@ -19,7 +19,7 @@ export const Default: Story = {
         <Card className="w-80">
             <CardHeader>
                 <CardTitle>INV-1042</CardTitle>
-                <CardDescription>Acme Inc. · due Oct 12</CardDescription>
+                <CardDescription>Northstar Studio · due Oct 12</CardDescription>
                 <CardAction>
                     <Button size="xs" variant="outline">
                         Open
