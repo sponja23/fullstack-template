@@ -12,6 +12,7 @@ import {
     type InvoiceStatus,
     type LineItemKind,
 } from "../../db/schema/index.ts";
+import { InvoiceNotFoundError } from "./invoice.errors.ts";
 
 export interface CreateLineItemRecord {
     id: string;
@@ -96,8 +97,9 @@ export class InvoiceRepository extends DatabaseRepository {
         values: { id: string; organizationId: string; clientId: string; currency: Currency },
         executor: DatabaseExecutor = this.database,
     ) {
-        await executor.insert(invoice).values(values);
-        return this.find(values.organizationId, values.id, executor);
+        const [draft] = await executor.insert(invoice).values(values).returning();
+        if (!draft) throw new Error("Invoice insert returned no row");
+        return draft;
     }
 
     async addLine(values: CreateLineItemRecord, executor: DatabaseExecutor = this.database) {
@@ -202,7 +204,7 @@ export class InvoiceRepository extends DatabaseRepository {
         return rows.length;
     }
 
-    async transition(
+    async requireTransition(
         organizationId: string,
         id: string,
         values: Partial<{
@@ -219,7 +221,10 @@ export class InvoiceRepository extends DatabaseRepository {
             .set({ ...values, updatedAt: new Date() })
             .where(and(eq(invoice.organizationId, organizationId), eq(invoice.id, id)))
             .returning({ id: invoice.id });
-        return row && this.find(organizationId, row.id, executor);
+        if (!row) throw new InvoiceNotFoundError();
+        const transitioned = await this.find(organizationId, row.id, executor);
+        if (!transitioned) throw new InvoiceNotFoundError();
+        return transitioned;
     }
 
     private listLines(invoiceId: string, executor: DatabaseExecutor) {

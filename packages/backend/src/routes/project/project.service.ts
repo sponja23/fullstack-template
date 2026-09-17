@@ -1,10 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { ClientRepository } from "../client/client.repository.ts";
-import {
-    ClientNotFoundError,
-    ProjectNotFoundError,
-    ProjectSlugTakenError,
-} from "../invoicing/invoicing.errors.ts";
+import { ClientNotFoundError } from "../client/client.errors.ts";
+import { ProjectNotFoundError } from "./project.errors.ts";
 import type { ProjectRepository } from "./project.repository.ts";
 
 export interface CreateProject {
@@ -38,33 +35,25 @@ export class ProjectService {
     }
 
     async create(organizationId: string, input: CreateProject) {
-        if (!(await this.clients.find(organizationId, input.clientId))) {
-            throw new ClientNotFoundError();
-        }
+        const client = await this.clients.find(organizationId, input.clientId);
+        if (!client) throw new ClientNotFoundError();
         const created = await this.projects.create({
             id: randomUUID(),
             organizationId,
             ...input,
         });
-        if (!created) throw new ProjectNotFoundError();
-        return created;
+        return { ...created, clientName: client.name, currency: client.currency };
     }
 
-    async update(organizationId: string, input: UpdateProject) {
-        const project = await this.projects.update(organizationId, input.id, {
+    update(organizationId: string, input: UpdateProject) {
+        return this.projects.requireUpdate(organizationId, input.id, {
             name: input.name,
             slug: input.slug,
             rateMinor: input.rateMinor,
         });
-        if (!project) throw new ProjectNotFoundError();
-        return project;
     }
 
-    async archive(organizationId: string, id: string) {
-        const project = await this.projects.archive(organizationId, id);
-        if (!project) throw new ProjectNotFoundError();
-        return project;
+    archive(organizationId: string, id: string) {
+        return this.projects.requireArchive(organizationId, id);
     }
 }
-
-export { ProjectSlugTakenError };

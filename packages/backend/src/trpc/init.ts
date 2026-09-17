@@ -3,13 +3,9 @@ import { SpanStatusCode, withSpan } from "@repo/telemetry";
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { BackendError } from "../errors/base.ts";
-import {
-    type ConstraintViolationRegistry,
-    pgConstraintViolation,
-} from "../errors/constraint-violation.ts";
 import type { AppContext } from "./context.ts";
 
-export function buildTrpc(constraintViolations: ConstraintViolationRegistry) {
+export function buildTrpc() {
     const t = initTRPC.context<AppContext>().create({
         transformer: superjson,
         errorFormatter({ shape, error }) {
@@ -52,20 +48,6 @@ export function buildTrpc(constraintViolations: ConstraintViolationRegistry) {
             const result = await next();
             if (!result.ok && result.error.cause instanceof BackendError) {
                 return { ...result, error: result.error.cause.toTRPCError() };
-            }
-            return result;
-        })
-        .use(async ({ next }) => {
-            const result = await next();
-            if (!result.ok) {
-                const constraint = pgConstraintViolation(result.error.cause);
-                const handlers = constraintViolations as Record<
-                    string,
-                    (cause: unknown) => BackendError
-                >;
-                if (constraint !== undefined && Object.hasOwn(handlers, constraint)) {
-                    throw handlers[constraint](result.error.cause);
-                }
             }
             return result;
         });

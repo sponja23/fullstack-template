@@ -10,7 +10,6 @@ import {
     unique,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
-import type { ConstraintName } from "../constraint-names.ts";
 import { member, organization } from "./organizations.schema.ts";
 
 export const currencies = ["USD", "EUR"] as const;
@@ -24,12 +23,12 @@ export type InvoiceStatus = (typeof invoiceStatuses)[number];
 export const lineItemKinds = ["generated", "manual"] as const;
 export type LineItemKind = (typeof lineItemKinds)[number];
 
-export const clientNameUnique = "client_organization_name_unique" satisfies ConstraintName;
-export const projectSlugUnique = "project_organization_slug_unique" satisfies ConstraintName;
-export const projectRateNonnegative = "project_rate_minor_nonnegative" satisfies ConstraintName;
-export const timeEntryMinutesPositive = "time_entry_minutes_positive" satisfies ConstraintName;
-export const invoiceNumberUnique = "invoice_organization_number_unique" satisfies ConstraintName;
-export const lineItemQuantityPositive = "line_item_quantity_positive" satisfies ConstraintName;
+export const clientNameUnique = "client_organization_name_unique";
+export const projectSlugUnique = "project_organization_slug_unique";
+const projectRateNonnegative = "project_rate_minor_nonnegative";
+const timeEntryMinutesPositive = "time_entry_minutes_positive";
+const invoiceNumberUnique = "invoice_organization_number_unique";
+const lineItemQuantityPositive = "line_item_quantity_positive";
 
 export const client = pgTable(
     "client",

@@ -1,7 +1,9 @@
 import { and, asc, eq } from "drizzle-orm";
+import { withConstraintErrors } from "../../db/constraint-errors.ts";
 import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
-import { client, type Currency } from "../../db/schema/index.ts";
+import { client, clientNameUnique, type Currency } from "../../db/schema/index.ts";
+import { ClientNameTakenError, ClientNotFoundError } from "./client.errors.ts";
 
 export interface CreateClientRecord {
     id: string;
@@ -35,11 +37,15 @@ export class ClientRepository extends DatabaseRepository {
     }
 
     async create(values: CreateClientRecord, executor: DatabaseExecutor = this.database) {
-        const [row] = await executor.insert(client).values(values).returning();
+        const [row] = await withConstraintErrors(
+            () => executor.insert(client).values(values).returning(),
+            { [clientNameUnique]: (cause) => new ClientNameTakenError(cause) },
+        );
+        if (!row) throw new Error("Client insert returned no row");
         return row;
     }
 
-    async update(
+    async requireUpdate(
         organizationId: string,
         id: string,
         values: UpdateClientRecord,
@@ -50,15 +56,21 @@ export class ClientRepository extends DatabaseRepository {
             .set({ ...values, updatedAt: new Date() })
             .where(and(eq(client.organizationId, organizationId), eq(client.id, id)))
             .returning();
+        if (!row) throw new ClientNotFoundError();
         return row;
     }
 
-    async archive(organizationId: string, id: string, executor: DatabaseExecutor = this.database) {
+    async requireArchive(
+        organizationId: string,
+        id: string,
+        executor: DatabaseExecutor = this.database,
+    ) {
         const [row] = await executor
             .update(client)
             .set({ status: "archived", updatedAt: new Date() })
             .where(and(eq(client.organizationId, organizationId), eq(client.id, id)))
             .returning();
+        if (!row) throw new ClientNotFoundError();
         return row;
     }
 }

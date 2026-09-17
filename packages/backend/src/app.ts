@@ -1,23 +1,9 @@
 import type { Auth } from "./auth/factory.ts";
 import type { Database } from "./db/factory.ts";
-import {
-    clientNameUnique,
-    invoiceNumberUnique,
-    lineItemQuantityPositive,
-    projectRateNonnegative,
-    projectSlugUnique,
-    timeEntryMinutesPositive,
-} from "./db/schema/index.ts";
-import { BadRequestError } from "./errors/base.ts";
-import type { ConstraintViolationRegistry } from "./errors/constraint-violation.ts";
 import { apiKeyUserRouter } from "./routes/api-key/api-key.user.router.ts";
 import { ClientRepository } from "./routes/client/client.repository.ts";
 import { ClientService } from "./routes/client/client.service.ts";
 import { clientUserRouter } from "./routes/client/client.user.router.ts";
-import {
-    ClientNameTakenError,
-    ProjectSlugTakenError,
-} from "./routes/invoicing/invoicing.errors.ts";
 import { InvoiceRepository } from "./routes/invoice/invoice.repository.ts";
 import { InvoiceService } from "./routes/invoice/invoice.service.ts";
 import { invoiceUserRouter } from "./routes/invoice/invoice.user.router.ts";
@@ -42,21 +28,9 @@ export interface AppDeps {
     auth: Auth;
 }
 
-export function buildConstraintViolationRegistry(): ConstraintViolationRegistry {
-    return {
-        [clientNameUnique]: () => new ClientNameTakenError(),
-        [projectSlugUnique]: () => new ProjectSlugTakenError(),
-        [projectRateNonnegative]: () => new BadRequestError("Hourly rate cannot be negative"),
-        [timeEntryMinutesPositive]: () => new BadRequestError("Minutes must be positive"),
-        [invoiceNumberUnique]: () => new BadRequestError("Invoice number is already in use"),
-        [lineItemQuantityPositive]: () =>
-            new BadRequestError("Line item quantity must be positive"),
-    };
-}
-
 /** Composes the backend graph and returns routers, context, and caller factories. */
 export function buildApp({ db, auth }: AppDeps) {
-    const { t, router, baseProcedure } = buildTrpc(buildConstraintViolationRegistry());
+    const { t, router, baseProcedure } = buildTrpc();
     const { authProcedure, orgProcedure } = buildUserProcedures(baseProcedure);
     const { superadminProcedure } = buildSuperadminProcedures(baseProcedure);
     const organizationDirectoryRepository = new OrganizationDirectoryRepository(db);

@@ -1,15 +1,15 @@
 import { randomUUID } from "node:crypto";
 import type { InvoiceStatus } from "../../db/schema/index.ts";
+import { ClientNotFoundError } from "../client/client.errors.ts";
+import type { ClientRepository } from "../client/client.repository.ts";
 import {
-    ClientNotFoundError,
     CurrencyMismatchError,
     InvalidInvoiceTransitionError,
     InvoiceEmptyError,
     InvoiceNotEditableError,
     InvoiceNotFoundError,
-    TimeEntryBilledError,
-} from "../invoicing/invoicing.errors.ts";
-import type { ClientRepository } from "../client/client.repository.ts";
+} from "./invoice.errors.ts";
+import { TimeEntryBilledError } from "../time-entry/time-entry.errors.ts";
 import type { InvoiceRepository } from "./invoice.repository.ts";
 
 export interface AddManualLine {
@@ -50,8 +50,12 @@ export class InvoiceService {
             clientId,
             currency: client.currency,
         });
-        if (!draft) throw new InvoiceNotFoundError();
-        return draft;
+        return {
+            ...draft,
+            clientName: client.name,
+            billingEmail: client.billingEmail,
+            lineItems: [],
+        };
     }
 
     async listUnbilledEntries(organizationId: string, invoiceId: string) {
@@ -125,26 +129,22 @@ export class InvoiceService {
                 if (claimed !== item.sourceEntryIds.length) throw new TimeEntryBilledError();
             }
             const number = await this.invoices.allocateNumber(organizationId, executor);
-            const issued = await this.invoices.transition(
+            return this.invoices.requireTransition(
                 organizationId,
                 id,
                 { status: "issued", number, issuedAt: new Date() },
                 executor,
             );
-            if (!issued) throw new InvoiceNotFoundError();
-            return issued;
         });
     }
 
     async markPaid(organizationId: string, id: string) {
         const invoice = await this.get(organizationId, id);
         if (invoice.status !== "issued") throw new InvalidInvoiceTransitionError();
-        const paid = await this.invoices.transition(organizationId, id, {
+        return this.invoices.requireTransition(organizationId, id, {
             status: "paid",
             paidAt: new Date(),
         });
-        if (!paid) throw new InvoiceNotFoundError();
-        return paid;
     }
 
     async markPaidByNumber(organizationId: string, number: number) {
@@ -157,12 +157,10 @@ export class InvoiceService {
         if (invoice.status !== "draft" && invoice.status !== "issued") {
             throw new InvalidInvoiceTransitionError();
         }
-        const voided = await this.invoices.transition(organizationId, id, {
+        return this.invoices.requireTransition(organizationId, id, {
             status: "void",
             voidedAt: new Date(),
         });
-        if (!voided) throw new InvoiceNotFoundError();
-        return voided;
     }
 
     private async editable(organizationId: string, id: string) {

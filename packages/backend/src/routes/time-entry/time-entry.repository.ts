@@ -2,6 +2,7 @@ import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
 import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import { client, member, project, timeEntry, user } from "../../db/schema/index.ts";
+import { TimeEntryNotFoundError } from "./time-entry.errors.ts";
 
 export interface CreateTimeEntryRecord {
     id: string;
@@ -43,8 +44,9 @@ export class TimeEntryRepository extends DatabaseRepository {
         executor: DatabaseExecutor = this.database,
     ) {
         const [row] = await executor
-            .select({ id: member.id })
+            .select({ id: member.id, name: user.name })
             .from(member)
+            .innerJoin(user, eq(member.userId, user.id))
             .where(and(eq(member.organizationId, organizationId), eq(member.userId, userId)))
             .limit(1);
         return row;
@@ -92,14 +94,12 @@ export class TimeEntryRepository extends DatabaseRepository {
     }
 
     async create(values: CreateTimeEntryRecord, executor: DatabaseExecutor = this.database) {
-        const [created] = await executor
-            .insert(timeEntry)
-            .values(values)
-            .returning({ id: timeEntry.id });
-        return created && this.find(values.organizationId, created.id, executor);
+        const [created] = await executor.insert(timeEntry).values(values).returning();
+        if (!created) throw new Error("Time entry insert returned no row");
+        return created;
     }
 
-    async update(
+    async requireUpdate(
         organizationId: string,
         id: string,
         values: UpdateTimeEntryRecord,
@@ -110,14 +110,22 @@ export class TimeEntryRepository extends DatabaseRepository {
             .set({ ...values, updatedAt: new Date() })
             .where(and(eq(timeEntry.organizationId, organizationId), eq(timeEntry.id, id)))
             .returning({ id: timeEntry.id });
-        return updated && this.find(organizationId, updated.id, executor);
+        if (!updated) throw new TimeEntryNotFoundError();
+        const entry = await this.find(organizationId, updated.id, executor);
+        if (!entry) throw new TimeEntryNotFoundError();
+        return entry;
     }
 
-    async delete(organizationId: string, id: string, executor: DatabaseExecutor = this.database) {
+    async requireDelete(
+        organizationId: string,
+        id: string,
+        executor: DatabaseExecutor = this.database,
+    ) {
         const [deleted] = await executor
             .delete(timeEntry)
             .where(and(eq(timeEntry.organizationId, organizationId), eq(timeEntry.id, id)))
             .returning({ id: timeEntry.id });
+        if (!deleted) throw new TimeEntryNotFoundError();
         return deleted;
     }
 

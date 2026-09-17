@@ -37,7 +37,12 @@ apiTestSuite({
                     billingEmail: "two@example.test",
                     currency: "USD",
                 }),
-            ).rejects.toMatchObject({ cause: { errorCode: "CLIENT_NAME_TAKEN" } });
+            ).rejects.toMatchObject({
+                cause: {
+                    errorCode: "CLIENT_NAME_TAKEN",
+                    cause: expect.objectContaining({ code: "23505" }),
+                },
+            });
             await expect(
                 request.clients.get({ id: "00000000-0000-4000-8000-000000000000" }),
             ).rejects.toMatchObject({ cause: { errorCode: "CLIENT_NOT_FOUND" } });

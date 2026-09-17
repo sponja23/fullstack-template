@@ -1,7 +1,9 @@
 import { and, asc, eq } from "drizzle-orm";
+import { withConstraintErrors } from "../../db/constraint-errors.ts";
 import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
-import { client, project } from "../../db/schema/index.ts";
+import { client, project, projectSlugUnique } from "../../db/schema/index.ts";
+import { ProjectNotFoundError, ProjectSlugTakenError } from "./project.errors.ts";
 
 export interface CreateProjectRecord {
     id: string;
@@ -74,14 +76,15 @@ export class ProjectRepository extends DatabaseRepository {
     }
 
     async create(values: CreateProjectRecord, executor: DatabaseExecutor = this.database) {
-        const [created] = await executor
-            .insert(project)
-            .values(values)
-            .returning({ id: project.id });
-        return created && this.findById(values.organizationId, created.id, executor);
+        const [created] = await withConstraintErrors(
+            () => executor.insert(project).values(values).returning(),
+            { [projectSlugUnique]: (cause) => new ProjectSlugTakenError(cause) },
+        );
+        if (!created) throw new Error("Project insert returned no row");
+        return created;
     }
 
-    async update(
+    async requireUpdate(
         organizationId: string,
         id: string,
         values: UpdateProjectRecord,
@@ -92,15 +95,25 @@ export class ProjectRepository extends DatabaseRepository {
             .set({ ...values, updatedAt: new Date() })
             .where(and(eq(project.organizationId, organizationId), eq(project.id, id)))
             .returning({ id: project.id });
-        return updated && this.findById(organizationId, updated.id, executor);
+        if (!updated) throw new ProjectNotFoundError();
+        const projectRow = await this.findById(organizationId, updated.id, executor);
+        if (!projectRow) throw new ProjectNotFoundError();
+        return projectRow;
     }
 
-    async archive(organizationId: string, id: string, executor: DatabaseExecutor = this.database) {
+    async requireArchive(
+        organizationId: string,
+        id: string,
+        executor: DatabaseExecutor = this.database,
+    ) {
         const [updated] = await executor
             .update(project)
             .set({ status: "archived", updatedAt: new Date() })
             .where(and(eq(project.organizationId, organizationId), eq(project.id, id)))
             .returning({ id: project.id });
-        return updated && this.findById(organizationId, updated.id, executor);
+        if (!updated) throw new ProjectNotFoundError();
+        const projectRow = await this.findById(organizationId, updated.id, executor);
+        if (!projectRow) throw new ProjectNotFoundError();
+        return projectRow;
     }
 }

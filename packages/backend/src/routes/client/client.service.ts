@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Currency } from "../../db/schema/index.ts";
-import { ClientNameTakenError, ClientNotFoundError } from "../invoicing/invoicing.errors.ts";
+import { ClientNotFoundError } from "./client.errors.ts";
 import type { ClientRepository } from "./client.repository.ts";
 
 export interface CreateClient {
@@ -32,20 +32,14 @@ export class ClientService {
         return this.clients.create({ id: randomUUID(), organizationId, ...input });
     }
 
-    async update(organizationId: string, input: UpdateClient) {
-        const client = await this.clients.update(organizationId, input.id, {
+    update(organizationId: string, input: UpdateClient) {
+        return this.clients.requireUpdate(organizationId, input.id, {
             name: input.name,
             billingEmail: input.billingEmail,
         });
-        if (!client) throw new ClientNotFoundError();
-        return client;
     }
 
-    async archive(organizationId: string, id: string) {
-        const client = await this.clients.archive(organizationId, id);
-        if (!client) throw new ClientNotFoundError();
-        return client;
+    archive(organizationId: string, id: string) {
+        return this.clients.requireArchive(organizationId, id);
     }
 }
-
-export { ClientNameTakenError };

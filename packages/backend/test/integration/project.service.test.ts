@@ -47,7 +47,12 @@ apiTestSuite({
                     slug: "same-slug",
                     rateMinor: 2,
                 }),
-            ).rejects.toMatchObject({ cause: { errorCode: "PROJECT_SLUG_TAKEN" } });
+            ).rejects.toMatchObject({
+                cause: {
+                    errorCode: "PROJECT_SLUG_TAKEN",
+                    cause: expect.objectContaining({ code: "23505" }),
+                },
+            });
             await expect(request.projects.get({ slug: "missing" })).rejects.toMatchObject({
                 cause: { errorCode: "PROJECT_NOT_FOUND" },
             });

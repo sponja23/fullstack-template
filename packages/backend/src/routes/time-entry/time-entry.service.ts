@@ -1,12 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { ForbiddenError } from "../../errors/base.ts";
+import { ProjectArchivedError, ProjectNotFoundError } from "../project/project.errors.ts";
 import type { ProjectRepository } from "../project/project.repository.ts";
-import {
-    MemberNotFoundError,
-    ProjectArchivedError,
-    ProjectNotFoundError,
-    TimeEntryBilledError,
-    TimeEntryNotFoundError,
-} from "../invoicing/invoicing.errors.ts";
+import { TimeEntryBilledError, TimeEntryNotFoundError } from "./time-entry.errors.ts";
 import type { TimeEntryRepository } from "./time-entry.repository.ts";
 
 export interface CreateTimeEntry {
@@ -45,36 +41,38 @@ export class TimeEntryService {
         if (!project) throw new ProjectNotFoundError();
         if (project.status === "archived") throw new ProjectArchivedError();
         const author = await this.entries.findMember(organizationId, userId);
-        if (!author) throw new MemberNotFoundError();
+        if (!author) throw new ForbiddenError();
         const created = await this.entries.create({
             id: randomUUID(),
             organizationId,
             authorId: author.id,
             ...input,
         });
-        if (!created) throw new TimeEntryNotFoundError();
-        return created;
+        return {
+            ...created,
+            projectName: project.name,
+            projectSlug: project.slug,
+            clientName: project.clientName,
+            authorName: author.name,
+        };
     }
 
     async update(organizationId: string, input: UpdateTimeEntry) {
         const current = await this.entries.find(organizationId, input.id);
         if (!current) throw new TimeEntryNotFoundError();
         if (current.lineItemId !== null) throw new TimeEntryBilledError();
-        const updated = await this.entries.update(organizationId, input.id, {
+        return this.entries.requireUpdate(organizationId, input.id, {
             date: input.date,
             minutes: input.minutes,
             note: input.note,
         });
-        if (!updated) throw new TimeEntryNotFoundError();
-        return updated;
     }
 
     async delete(organizationId: string, id: string) {
         const current = await this.entries.find(organizationId, id);
         if (!current) throw new TimeEntryNotFoundError();
         if (current.lineItemId !== null) throw new TimeEntryBilledError();
-        const deleted = await this.entries.delete(organizationId, id);
-        if (!deleted) throw new TimeEntryNotFoundError();
+        await this.entries.requireDelete(organizationId, id);
         return { success: true as const };
     }
 }
