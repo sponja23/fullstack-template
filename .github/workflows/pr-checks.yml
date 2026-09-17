@@ -1,0 +1,98 @@
+# Each affected workspace package runs its colocated static checks and tests.
+# A package is affected when it changed from the PR base or transitively depends
+# on one that did; dependency-graph changes at the workspace root affect all.
+name: PR checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Affected package checks
+    runs-on: ubuntu-latest
+    env:
+      RUN_BROWSER_TESTS: "1"
+      TEST_PG_ADMIN_URL: postgres://postgres:postgres@localhost:5432/postgres
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Determine affected packages
+        id: affected
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: .github/scripts/affected-packages.sh "${BASE_SHA}"
+
+      - name: Install Chromium
+        if: ${{ steps.affected.outputs.storybook == 'true' }}
+        working-directory: tools/storybook
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: "@repo/api"
+        if: ${{ !cancelled() && steps.affected.outputs.api == 'true' }}
+        uses: ./apps/api/ci/checks
+      - name: "@repo/website"
+        if: ${{ !cancelled() && steps.affected.outputs.website == 'true' }}
+        uses: ./apps/website/ci/checks
+      - name: "@repo/tsconfig"
+        if: ${{ !cancelled() && steps.affected.outputs.tsconfig == 'true' }}
+        uses: ./config/tsconfig/ci/checks
+      - name: "@repo/backend"
+        if: ${{ !cancelled() && steps.affected.outputs.backend == 'true' }}
+        uses: ./packages/backend/ci/checks
+      - name: "@repo/client"
+        if: ${{ !cancelled() && steps.affected.outputs.client == 'true' }}
+        uses: ./packages/client/ci/checks
+      - name: "@repo/logger"
+        if: ${{ !cancelled() && steps.affected.outputs.logger == 'true' }}
+        uses: ./packages/logger/ci/checks
+      - name: "@repo/rest-api"
+        if: ${{ !cancelled() && steps.affected.outputs.rest_api == 'true' }}
+        uses: ./packages/rest-api/ci/checks
+      - name: "@repo/telemetry"
+        if: ${{ !cancelled() && steps.affected.outputs.telemetry == 'true' }}
+        uses: ./packages/telemetry/ci/checks
+      - name: "@repo/ui"
+        if: ${{ !cancelled() && steps.affected.outputs.ui == 'true' }}
+        uses: ./packages/ui/ci/checks
+      - name: "@repo/utils"
+        if: ${{ !cancelled() && steps.affected.outputs.utils == 'true' }}
+        uses: ./packages/utils/ci/checks
+      - name: "@repo/storybook"
+        if: ${{ !cancelled() && steps.affected.outputs.storybook == 'true' }}
+        uses: ./tools/storybook/ci/checks
