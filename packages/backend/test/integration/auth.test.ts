@@ -39,6 +39,91 @@ apiTestSuite({
             );
         });
 
+        test("keeps a removed member's time visible and billable while revoking their session", async ({
+            harness,
+            request,
+        }) => {
+            const contributor = await harness.signUpUser();
+            const membership = await harness.auth.api.addMember({
+                body: {
+                    userId: contributor.userId,
+                    role: "member",
+                    organizationId: harness.organizationId,
+                },
+                headers: harness.authHeaders(harness.cookieHeader),
+            });
+            await harness.auth.api.setActiveOrganization({
+                body: { organizationId: harness.organizationId },
+                headers: harness.authHeaders(contributor.cookieHeader),
+            });
+            const activeSession = await harness.auth.api.getSession({
+                headers: harness.authHeaders(contributor.cookieHeader),
+            });
+            expect(activeSession?.session.activeOrganizationId).toBe(harness.organizationId);
+
+            const client = await request.clients.create({
+                name: "Former member client",
+                billingEmail: "former-member@example.test",
+                currency: "USD",
+            });
+            const project = await request.projects.create({
+                clientId: client.id,
+                name: "Former member project",
+                slug: "former-member-project",
+                rateMinor: 9_000,
+            });
+            const entry = await contributor.request.timeEntries.create({
+                projectId: project.id,
+                date: "2026-09-16",
+                minutes: 60,
+                note: "Work that outlives membership",
+            });
+
+            await expect(
+                harness.auth.api.removeMember({
+                    body: {
+                        memberIdOrEmail: membership.id,
+                        organizationId: harness.organizationId,
+                    },
+                    headers: harness.authHeaders(harness.cookieHeader),
+                }),
+            ).resolves.toMatchObject({ member: { id: membership.id } });
+            await expect(
+                harness.auth.api.getSession({
+                    headers: harness.authHeaders(contributor.cookieHeader),
+                }),
+            ).resolves.toBeNull();
+
+            await expect(
+                request.timeEntries.listForProject({ projectId: project.id }),
+            ).resolves.toContainEqual(
+                expect.objectContaining({
+                    id: entry.id,
+                    authorId: contributor.userId,
+                    authorName: activeSession?.user.name,
+                    lineItemId: null,
+                }),
+            );
+            const draft = await request.invoices.createDraft({ clientId: client.id });
+            await expect(
+                request.invoices.listUnbilledEntries({ invoiceId: draft.id }),
+            ).resolves.toContainEqual(expect.objectContaining({ id: entry.id }));
+            await request.invoices.addTimeLines({ invoiceId: draft.id, entryIds: [entry.id] });
+            const issued = await request.invoices.issue({ id: draft.id });
+            expect(issued.lineItems).toContainEqual(
+                expect.objectContaining({ sourceEntryIds: [entry.id] }),
+            );
+            await expect(
+                request.timeEntries.listForProject({ projectId: project.id }),
+            ).resolves.toContainEqual(
+                expect.objectContaining({
+                    id: entry.id,
+                    authorName: activeSession?.user.name,
+                    lineItemId: expect.any(String),
+                }),
+            );
+        });
+
         test("mints and verifies an organization API key", async ({ harness, request }) => {
             const issued = await request.apiKeys.issue({
                 name: "integration",

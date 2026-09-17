@@ -150,7 +150,7 @@ const entries = [
         id: "30000000-0000-4000-8000-000000000001",
         organizationId: organization.id,
         projectId: projects[0].id,
-        authorId: owner.id,
+        authorId: owner.user.id,
         date: isoDate(0),
         minutes: 90,
         note: "Homepage concepts",
@@ -166,7 +166,7 @@ const entries = [
         id: "30000000-0000-4000-8000-000000000002",
         organizationId: organization.id,
         projectId: projects[0].id,
-        authorId: member.id,
+        authorId: member.user.id,
         date: isoDate(-1),
         minutes: 120,
         note: "Research",
@@ -191,6 +191,18 @@ const invoiceLines = [
         unitAmountMinor: projects[0].rateMinor,
         totalMinor: 30_000,
         sourceEntryIds: [entries[1].id],
+        createdAt: EPOCH,
+    },
+    {
+        id: "40000000-0000-4000-8000-000000000002",
+        invoiceId: "50000000-0000-4000-8000-000000000002",
+        projectId: null,
+        kind: "manual" as const,
+        description: "Travel expenses",
+        quantity: 2,
+        unitAmountMinor: 500,
+        totalMinor: 1_000,
+        sourceEntryIds: [],
         createdAt: EPOCH,
     },
 ];
@@ -236,7 +248,7 @@ const invoices = [
     currency: clients[0].currency,
     createdAt: EPOCH,
     updatedAt: EPOCH,
-    totalMinor: value.status === "draft" ? 0 : 30_000,
+    totalMinor: value.status === "draft" ? 0 : 31_000,
 }));
 const invoiceDetails = invoices.map(({ totalMinor: _totalMinor, ...invoice }) => ({
     ...invoice,
@@ -298,7 +310,7 @@ const acmeAgency: World = {
             entries.filter(
                 (entry) => entry.projectId === (input as { projectId: string }).projectId,
             ),
-        "timeEntries.listMine": () => entries.filter((entry) => entry.authorId === owner.id),
+        "timeEntries.listMine": () => entries.filter((entry) => entry.authorId === owner.user.id),
         "invoices.list": () => invoices,
         "invoices.get": (input) =>
             invoiceDetails.find((invoice) => invoice.id === (input as { id: string }).id) ??

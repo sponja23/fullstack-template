@@ -1,10 +1,15 @@
+import { randomUUID } from "node:crypto";
 import { expect } from "vitest";
+import { lineItem } from "../../src/db/schema/index.ts";
 import { apiTestSuite } from "../suite.ts";
 
 apiTestSuite({
     name: "invoice service",
     cases: (test) => {
-        test("builds lines, issues atomically, and follows the lifecycle", async ({ request }) => {
+        test("builds arithmetically valid lines, issues atomically, and follows the lifecycle", async ({
+            harness,
+            request,
+        }) => {
             const client = await request.clients.create({
                 name: "Invoice client",
                 billingEmail: "invoice@example.test",
@@ -38,6 +43,24 @@ apiTestSuite({
                     expect.objectContaining({ kind: "manual", totalMinor: 1_000 }),
                 ]),
             );
+            for (const line of issued.lineItems) {
+                const expectedTotal =
+                    line.kind === "generated"
+                        ? Math.round((line.quantity * line.unitAmountMinor) / 60)
+                        : line.quantity * line.unitAmountMinor;
+                expect(line.totalMinor).toBe(expectedTotal);
+            }
+            await expect(
+                harness.db.insert(lineItem).values({
+                    id: randomUUID(),
+                    invoiceId: issued.id,
+                    kind: "manual",
+                    description: "Invalid arithmetic",
+                    quantity: 2,
+                    unitAmountMinor: 500,
+                    totalMinor: 999,
+                }),
+            ).rejects.toMatchObject({ cause: expect.objectContaining({ code: "23514" }) });
             await expect(
                 request.timeEntries.update({
                     id: entry.id,

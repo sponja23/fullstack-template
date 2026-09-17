@@ -1,7 +1,7 @@
 import type { Meta, RouterParameters, StoryObj } from "@storybook/tanstack-react";
 import { storyRoute } from "@/routes/-story-route";
 
-const id = "50000000-0000-4000-8000-000000000001";
+const id = "50000000-0000-4000-8000-000000000002";
 const parents = {
     "/_authenticated": { beforeLoad: () => {} },
     "/_authenticated/_shell/_dashboard": { beforeLoad: () => {} },

@@ -10,7 +10,8 @@ import {
     unique,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { member, organization } from "./organizations.schema.ts";
+import { user } from "./auth.schema.ts";
+import { organization } from "./organizations.schema.ts";
 
 export const currencies = ["USD", "EUR"] as const;
 export type Currency = (typeof currencies)[number];
@@ -29,6 +30,7 @@ const projectRateNonnegative = "project_rate_minor_nonnegative";
 const timeEntryMinutesPositive = "time_entry_minutes_positive";
 const invoiceNumberUnique = "invoice_organization_number_unique";
 const lineItemQuantityPositive = "line_item_quantity_positive";
+const lineItemArithmeticValid = "line_item_arithmetic_valid";
 
 export const client = pgTable(
     "client",
@@ -124,6 +126,10 @@ export const lineItem = pgTable(
     },
     (table) => [
         check(lineItemQuantityPositive, sql`${table.quantity} > 0`),
+        check(
+            lineItemArithmeticValid,
+            sql`(${table.kind} = 'manual' and ${table.totalMinor} = ${table.quantity} * ${table.unitAmountMinor}) or (${table.kind} = 'generated' and ${table.totalMinor} = round(${table.quantity}::numeric * ${table.unitAmountMinor} / 60))`,
+        ),
         index("line_item_invoice_idx").on(table.invoiceId),
     ],
 );
@@ -147,11 +153,10 @@ export const timeEntry = pgTable(
             .references(() => project.id, { onDelete: "cascade" }),
         authorId: text("author_id")
             .notNull()
-            .references(() => member.id, { onDelete: "restrict" }),
+            .references(() => user.id, { onDelete: "restrict" }),
         date: date("date", { mode: "string" }).notNull(),
         minutes: integer("minutes").notNull(),
         note: text("note").notNull(),
-        // The invoice slice adds the foreign key when it introduces line_item.
         lineItemId: text("line_item_id").references(() => lineItem.id, { onDelete: "restrict" }),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -187,7 +192,7 @@ export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
         references: [organization.id],
     }),
     project: one(project, { fields: [timeEntry.projectId], references: [project.id] }),
-    author: one(member, { fields: [timeEntry.authorId], references: [member.id] }),
+    author: one(user, { fields: [timeEntry.authorId], references: [user.id] }),
     lineItem: one(lineItem, { fields: [timeEntry.lineItemId], references: [lineItem.id] }),
 }));
 

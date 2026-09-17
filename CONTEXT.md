@@ -20,7 +20,7 @@ _Avoid_: job, engagement.
 
 ## Time entry
 
-A positive number of minutes worked by an Organization member on a Project on a particular date, optionally described by a note. It is unbilled until an invoice line item claims it; a billed Time entry is immutable.
+A positive number of minutes worked by a User for an Organization on a Project on a particular date, optionally described by a note. It retains the author's User identity after Organization membership ends; it is unbilled until a Line item claims it, after which it is immutable.
 
 _Avoid_: timesheet, log.
 
@@ -34,8 +34,6 @@ _Avoid_: bill.
 
 ## Line item
 
-A child of an Invoice carrying an integer quantity, unit amount, and total in the Invoice currency. A
-generated Line item groups selected Time entries for one Project using minutes and its hourly rate; a
-manual Line item is entered directly. Line items are never accessed independently of their Invoice.
+A child of an Invoice carrying an integer quantity, unit amount, and total in the Invoice currency. A generated Line item's quantity is minutes at the Project's hourly unit amount; a manual Line item uses ordinary units, and neither is accessed independently of its Invoice.
 
 _Avoid_: line, row, item.

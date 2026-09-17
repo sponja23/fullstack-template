@@ -44,7 +44,7 @@ export class TimeEntryRepository extends DatabaseRepository {
         executor: DatabaseExecutor = this.database,
     ) {
         const [row] = await executor
-            .select({ id: member.id, name: user.name })
+            .select({ userId: member.userId, name: user.name })
             .from(member)
             .innerJoin(user, eq(member.userId, user.id))
             .where(and(eq(member.organizationId, organizationId), eq(member.userId, userId)))
@@ -78,7 +78,7 @@ export class TimeEntryRepository extends DatabaseRepository {
             .where(
                 and(
                     eq(timeEntry.organizationId, organizationId),
-                    eq(member.userId, userId),
+                    eq(timeEntry.authorId, userId),
                     gte(timeEntry.date, from),
                     lte(timeEntry.date, to),
                 ),
@@ -135,7 +135,6 @@ export class TimeEntryRepository extends DatabaseRepository {
             .from(timeEntry)
             .innerJoin(project, eq(timeEntry.projectId, project.id))
             .innerJoin(client, eq(project.clientId, client.id))
-            .innerJoin(member, eq(timeEntry.authorId, member.id))
-            .innerJoin(user, eq(member.userId, user.id));
+            .innerJoin(user, eq(timeEntry.authorId, user.id));
     }
 }

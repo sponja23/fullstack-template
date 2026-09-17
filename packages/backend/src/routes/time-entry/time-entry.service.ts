@@ -45,7 +45,7 @@ export class TimeEntryService {
         const created = await this.entries.create({
             id: randomUUID(),
             organizationId,
-            authorId: author.id,
+            authorId: author.userId,
             ...input,
         });
         return {
