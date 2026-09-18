@@ -102,4 +102,4 @@ Single-context projects use `CONTEXT.md` and `docs/adr/`, created lazily. See `d
 
 ### Workflow skills
 
-`grill-with-docs`, `to-tickets`, `implement`, and `triage` are optional user-level skills from a public repository. They are referenced by name and are not stored here.
+`grilling`, `grill-with-docs`, `to-tickets`, `implement`, and `triage` are optional user-level skills from a public repository. They are referenced by name and are not stored here.
