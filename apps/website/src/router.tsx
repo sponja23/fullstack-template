@@ -13,7 +13,13 @@ export interface RouterContext {
 }
 
 export function createAppRouter(context: RouterContext) {
-    return createRouter({ routeTree, defaultPreload: "intent", context });
+    return createRouter({
+        routeTree,
+        defaultPreload: "intent",
+        // Query owns caching, so a hover preload must not skip the loader for the router's default 30 seconds.
+        defaultPreloadStaleTime: 0,
+        context,
+    });
 }
 
 export type AppRouter = ReturnType<typeof createAppRouter>;
