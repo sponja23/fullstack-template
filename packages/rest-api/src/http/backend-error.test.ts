@@ -3,7 +3,7 @@ import { captureLogs } from "@repo/logger";
 import { Hono } from "hono";
 import { describe, expect, it } from "vitest";
 import { handleError } from "./backend-error.ts";
-import type { ErrorResponseBody } from "./error-response.ts";
+import type { ErrorResponse } from "./error-response.ts";
 
 class UpstreamFailedError extends BadGatewayError {
     readonly errorCode = "UPSTREAM_FAILED" as BackendErrorCode;
@@ -29,7 +29,7 @@ describe("handleError", () => {
         );
 
         expect(response.status).toBe(502);
-        expect(await response.json()).toEqual<ErrorResponseBody>({
+        expect(await response.json()).toEqual<ErrorResponse>({
             error: { code: "UPSTREAM_FAILED", message: "connect ECONNREFUSED" },
         });
         expect(logs).toMatchObject([{ level: "warn", attrs: { errorCode: "UPSTREAM_FAILED" } }]);
