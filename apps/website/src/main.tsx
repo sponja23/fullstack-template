@@ -32,7 +32,6 @@ function App() {
     );
 }
 
-/** The page has no `#app` element for React to mount into. */
 class MissingAppRootError extends Error {
     constructor() {
         super("#app not found");

@@ -45,6 +45,12 @@ export function useUser() {
     return { ...auth, user: auth.user };
 }
 
+export function useActiveOrganizationId() {
+    const { activeOrganizationId } = useUser();
+    if (activeOrganizationId == null) throw new MissingActiveOrganizationError();
+    return activeOrganizationId;
+}
+
 export interface SignInVars {
     email: string;
     password: string;

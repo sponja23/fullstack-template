@@ -2,7 +2,7 @@ import type { AnyRoute } from "@tanstack/react-router";
 import { routeTree, type FileRoutesById } from "@/routeTree.gen";
 
 /** A story named a file-route ID that the generated route tree does not contain. */
-export class StoryRouteNotFoundError extends Error {
+class StoryRouteNotFoundError extends Error {
     constructor(readonly id: string) {
         super(`Story route ${id} was not found`);
         this.name = "StoryRouteNotFoundError";
