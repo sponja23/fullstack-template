@@ -1,4 +1,4 @@
-import { InvalidInputError, type ApiScope } from "@repo/backend";
+import { BadRequestError, InvalidInputError, type ApiScope } from "@repo/backend";
 import { type OpenAPIHono, type RouteConfig, createRoute, z } from "@hono/zod-openapi";
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
@@ -109,6 +109,13 @@ export function createRouteRegistrar(app: OpenAPIHono<ApiEnv>, verifier: ApiKeyV
 
 export type RouteRegistrar = ReturnType<typeof createRouteRegistrar>;
 
+export class MalformedJsonBodyError extends BadRequestError {
+    readonly errorCode = "MALFORMED_JSON_BODY" as const;
+    constructor(cause: unknown) {
+        super("The request body is not valid JSON", { cause });
+    }
+}
+
 async function validateOptionalBody(context: Context, schema: z.ZodType): Promise<unknown> {
     const text = context.req.header("content-type")?.includes("application/json")
         ? await context.req.text()
@@ -118,12 +125,12 @@ async function validateOptionalBody(context: Context, schema: z.ZodType): Promis
         try {
             raw = JSON.parse(text);
         } catch (cause) {
-            throw new InvalidInputError("The request body is not valid JSON.", { cause });
+            throw new MalformedJsonBodyError(cause);
         }
     }
     const parsed = schema.safeParse(raw);
     if (!parsed.success) {
-        throw new InvalidInputError(z.prettifyError(parsed.error), { cause: parsed.error });
+        throw new InvalidInputError(parsed.error);
     }
     return parsed.data;
 }

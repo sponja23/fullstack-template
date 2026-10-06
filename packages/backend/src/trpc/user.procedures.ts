@@ -1,7 +1,14 @@
 import type { AnyTRPCRouter } from "@trpc/server";
 import { toOrgSession, toSession } from "../auth/session.ts";
-import { InvalidInputError, UnauthenticatedError } from "../errors/base.ts";
+import { BadRequestError, UnauthenticatedError } from "../errors/base.ts";
 import type { BaseProcedure, RouterBuilder } from "./init.ts";
+
+export class NoActiveOrganizationError extends BadRequestError {
+    readonly errorCode = "NO_ACTIVE_ORGANIZATION" as const;
+    constructor() {
+        super("Select an organization first");
+    }
+}
 
 export function buildUserProcedures(baseProcedure: BaseProcedure) {
     const authProcedure = baseProcedure.use(async ({ ctx: { auth, headers }, next }) => {
@@ -14,7 +21,7 @@ export function buildUserProcedures(baseProcedure: BaseProcedure) {
         if (!authSession) throw new UnauthenticatedError();
         const session = toSession(authSession);
         const organizationId = session.session.activeOrganizationId;
-        if (!organizationId) throw new InvalidInputError("Select an organization first.");
+        if (!organizationId) throw new NoActiveOrganizationError();
         return next({ ctx: { session: toOrgSession(session, organizationId) } });
     });
     return { authProcedure, orgProcedure };

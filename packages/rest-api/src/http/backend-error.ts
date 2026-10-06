@@ -11,7 +11,6 @@ const TRPC_TO_HTTP: Record<string, ContentfulStatusCode> = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     CONFLICT: 409,
-    INTERNAL_SERVER_ERROR: 500,
     BAD_GATEWAY: 502,
 };
 
@@ -19,7 +18,8 @@ export function handleError(error: Error, context: Context): Response {
     if (error instanceof BackendError) {
         const status = TRPC_TO_HTTP[error.trpcCode] ?? 500;
         const attrs = { errorCode: error.errorCode, trpcCode: error.trpcCode };
-        if (status === 502) log.warn("an upstream the backend called failed", error, attrs);
+        if (error.trpcCode === "BAD_GATEWAY")
+            log.warn("an upstream the backend called failed", error, attrs);
         else if (status >= 500) log.error("backend error surfaced as 5xx", error, attrs);
         return context.json(errorBody(error.errorCode, error.message), status);
     }
