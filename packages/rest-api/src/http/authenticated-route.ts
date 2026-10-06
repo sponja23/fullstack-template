@@ -117,11 +117,13 @@ async function validateOptionalBody(context: Context, schema: z.ZodType): Promis
     if (text.trim() !== "") {
         try {
             raw = JSON.parse(text);
-        } catch {
-            throw new InvalidInputError("The request body is not valid JSON.");
+        } catch (cause) {
+            throw new InvalidInputError("The request body is not valid JSON.", { cause });
         }
     }
     const parsed = schema.safeParse(raw);
-    if (!parsed.success) throw new InvalidInputError(z.prettifyError(parsed.error));
+    if (!parsed.success) {
+        throw new InvalidInputError(z.prettifyError(parsed.error), { cause: parsed.error });
+    }
     return parsed.data;
 }

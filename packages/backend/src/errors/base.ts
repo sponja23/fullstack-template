@@ -61,12 +61,10 @@ export abstract class InternalServerError extends BackendError {
     readonly trpcCode = "INTERNAL_SERVER_ERROR" as const;
 }
 
-/** The failure of an upstream service the backend called, rather than of the backend itself. */
 export abstract class BadGatewayError extends BackendError {
     readonly trpcCode = "BAD_GATEWAY" as const;
 }
 
-/** The caller is not authenticated. */
 export class UnauthenticatedError extends UnauthorizedError {
     readonly errorCode = "UNAUTHORIZED" as const;
     constructor(message = "Unauthorized") {
@@ -74,7 +72,6 @@ export class UnauthenticatedError extends UnauthorizedError {
     }
 }
 
-/** The caller is authenticated but lacks the privileges for this action. */
 export class InsufficientPrivilegesError extends ForbiddenError {
     readonly errorCode = "FORBIDDEN" as const;
     constructor(message = "Forbidden") {

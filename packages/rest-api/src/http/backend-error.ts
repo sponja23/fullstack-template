@@ -19,7 +19,6 @@ export function handleError(error: Error, context: Context): Response {
     if (error instanceof BackendError) {
         const status = TRPC_TO_HTTP[error.trpcCode] ?? 500;
         const attrs = { errorCode: error.errorCode, trpcCode: error.trpcCode };
-        // A 502 is an upstream's fault rather than ours, so it stays below the level operators page on.
         if (status === 502) log.warn("an upstream the backend called failed", error, attrs);
         else if (status >= 500) log.error("backend error surfaced as 5xx", error, attrs);
         return context.json(errorBody(error.errorCode, error.message), status);
