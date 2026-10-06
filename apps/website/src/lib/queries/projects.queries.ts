@@ -9,6 +9,7 @@ import type { UserAppRouter } from "@repo/client";
 import { useTRPCClient } from "@/lib/trpc";
 import { ensureAPIQueryData, useAPIMutation } from "./api-queries";
 import { useUser } from "./auth.queries";
+import { MissingActiveOrganizationError } from "./queries.errors";
 
 function projectsQueryOptions(
     organizationId: string,
@@ -35,14 +36,14 @@ function projectQueryOptions(
 export function useProjects(clientId?: string) {
     const { activeOrganizationId } = useUser();
     const client = useTRPCClient();
-    if (activeOrganizationId == null) throw new Error("An active organization is required");
+    if (activeOrganizationId == null) throw new MissingActiveOrganizationError();
     return useSuspenseQuery(projectsQueryOptions(activeOrganizationId, client, clientId));
 }
 
 export function useProject(slug: string) {
     const { activeOrganizationId } = useUser();
     const client = useTRPCClient();
-    if (activeOrganizationId == null) throw new Error("An active organization is required");
+    if (activeOrganizationId == null) throw new MissingActiveOrganizationError();
     return useSuspenseQuery(projectQueryOptions(activeOrganizationId, slug, client));
 }
 

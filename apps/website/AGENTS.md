@@ -16,6 +16,7 @@ Dotted suffixes are a closed set of component and artifact roles:
 - **`.queries.ts`** — a private `*QueryOptions()`, a reactive `use*`, and a loader-side `ensure*Data` as documented in `src/lib/queries/AGENTS.md`.
 - **`.form.ts`** — a `use<X>Form` over `useMutationForm` paired with a `use<X>FormContext` over the same `formOptions`.
 - **`.field.tsx`** — a component registered in `createFormHook`'s `fieldComponents`, reading `useFieldContext` and applying the shared touch-and-blur invalid policy.
+- **`.errors.ts`** — an error family that several modules throw, or that callers elsewhere catch by class.
 - **Tooling artifacts** — `.stories.tsx`, `.test.ts`, `.config.ts`, and `routeTree.gen.ts` follow their tooling-defined conventions.
 
 Every other descriptive multi-word module name uses kebab-case. TanStack Router's flat-route syntax is the exception: dots separate path segments in route filenames such as `$invoiceId.print.tsx`; those dots are routing syntax, not role suffixes.
