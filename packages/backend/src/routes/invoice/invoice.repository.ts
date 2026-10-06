@@ -12,7 +12,7 @@ import {
     type InvoiceStatus,
     type LineItemKind,
 } from "../../db/schema/index.ts";
-import { InvoiceNotFoundError } from "./invoice.errors.ts";
+import { InvoiceInvariantError, InvoiceNotFoundError } from "./invoice.errors.ts";
 
 export interface CreateLineItemRecord {
     id: string;
@@ -98,7 +98,7 @@ export class InvoiceRepository extends DatabaseRepository {
         executor: DatabaseExecutor = this.database,
     ) {
         const [draft] = await executor.insert(invoice).values(values).returning();
-        if (!draft) throw new Error("Invoice insert returned no row");
+        if (!draft) throw new InvoiceInvariantError("insert returned no row");
         return draft;
     }
 
@@ -179,7 +179,7 @@ export class InvoiceRepository extends DatabaseRepository {
             .set({ next: sql`${invoiceCounter.next} + 1` })
             .where(eq(invoiceCounter.organizationId, organizationId))
             .returning({ number: invoiceCounter.next });
-        if (!row) throw new Error("Invoice counter could not be allocated");
+        if (!row) throw new InvoiceInvariantError("counter could not be allocated");
         return row.number;
     }
 

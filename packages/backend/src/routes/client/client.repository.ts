@@ -3,7 +3,11 @@ import { withConstraintErrors } from "../../db/constraint-errors.ts";
 import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import { client, clientNameUnique, type Currency } from "../../db/schema/index.ts";
-import { ClientNameTakenError, ClientNotFoundError } from "./client.errors.ts";
+import {
+    ClientInvariantError,
+    ClientNameTakenError,
+    ClientNotFoundError,
+} from "./client.errors.ts";
 
 export interface CreateClientRecord {
     id: string;
@@ -41,7 +45,7 @@ export class ClientRepository extends DatabaseRepository {
             () => executor.insert(client).values(values).returning(),
             { [clientNameUnique]: (cause) => new ClientNameTakenError(cause) },
         );
-        if (!row) throw new Error("Client insert returned no row");
+        if (!row) throw new ClientInvariantError("insert returned no row");
         return row;
     }
 

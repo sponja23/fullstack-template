@@ -2,7 +2,7 @@ import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
 import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import { client, member, project, timeEntry, user } from "../../db/schema/index.ts";
-import { TimeEntryNotFoundError } from "./time-entry.errors.ts";
+import { TimeEntryInvariantError, TimeEntryNotFoundError } from "./time-entry.errors.ts";
 
 export interface CreateTimeEntryRecord {
     id: string;
@@ -95,7 +95,7 @@ export class TimeEntryRepository extends DatabaseRepository {
 
     async create(values: CreateTimeEntryRecord, executor: DatabaseExecutor = this.database) {
         const [created] = await executor.insert(timeEntry).values(values).returning();
-        if (!created) throw new Error("Time entry insert returned no row");
+        if (!created) throw new TimeEntryInvariantError("insert returned no row");
         return created;
     }
 

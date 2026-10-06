@@ -50,7 +50,9 @@ Environment is read only in `apps/api/src/env.ts`; the parsed values enter `buil
 
 ## Errors
 
-Every backend error extends `BackendError`, carrying a closed `BackendErrorCode` and a tRPC code. Resource errors extend an intermediate such as `NotFoundError` or `ConflictError`. Add every new code to the union.
+The root Errors rule applies, and every backend error extends `BackendError` in `errors/base.ts`, carrying an `errorCode` from the closed `BackendErrorCode` union and a `trpcCode`. Concrete domain errors live in `<resource>/<resource>.errors.ts` and extend the abstract intermediate that fixes their `trpcCode` (`BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `InternalServerError`, `BadGatewayError`); `trpcCode` is declared only in `errors/base.ts`, never on a concrete error, and a code with no intermediate yet gets one there. The catch-alls `InvalidInputError`, `UnauthenticatedError` and `InsufficientPrivilegesError` are named by meaning and fix a generic `errorCode`, for failures no domain error describes. Add every new code to the union.
+
+A check for a state the code guarantees can't occur throws an `InternalServerError` subclass with its area's `<AREA>_INVARIANT_VIOLATION` code, like `INVOICE_INVARIANT_VIOLATION`. A failure of an upstream service the backend calls goes on a `BadGatewayError` subclass, not an `InternalServerError`, so it is not reported as a fault of ours.
 
 A repository write whose named Postgres constraint should surface as a domain error wraps only that statement with `withConstraintErrors(write, mapping)` from `db/constraint-errors.ts`. Export each mapped constraint name as a `const` from its schema module and use it both in the Drizzle declaration and as the mapping key. The helper rethrows the mapped domain error with the driver error as its cause; it never returns a violation from inside a transaction. Constraints that represent internal invariants remain unmapped and surface as 500s.
 
