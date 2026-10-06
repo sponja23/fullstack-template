@@ -15,8 +15,8 @@
 
 Each domain resource lives under `src/routes/<resource>/` with up to three layers:
 
-- Repository (`*.repository.ts`) is the only layer touching the database. It extends `DatabaseRepository`. Methods participating in caller-owned transactions accept a final `executor: DatabaseExecutor = this.database`. The repository translates database signals only it can decode into domain errors. Method names carry absence semantics: `find*`/`resolve*` ask and return a total value, while `require*` asserts and throws; add a `require*` only when every caller of the asking form already performs the same throw.
-- Service (`*.service.ts`) owns domain logic and transactions and orchestrates repositories.
+- Repository (`*.repository.ts`) is the only layer touching the database. It extends `DatabaseRepository`. A method that must run in a transaction takes `tx: Transaction`; one sometimes called in one takes `executor: DatabaseExecutor = this.database`. The repository translates database signals only it can decode into domain errors. Method names carry absence semantics: `find*`/`resolve*` ask and return a total value, while `require*` asserts and throws; add a `require*` only when every caller of the asking form already performs the same throw.
+- Service (`*.service.ts`) owns domain logic and orchestrates repositories. It opens transactions with the injected `TransactionRunner` (`db/transaction.ts`) and registers post-commit work with `scope.afterCommit`.
 - Router (`*.<principal>.router.ts`) validates with Zod, calls one service method, and returns the result. Declare builders with `satisfies <Principal>RouterBuilder<Deps>`.
 
 Split repositories by table and owner; group by feature at the service and router layers.

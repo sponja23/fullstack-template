@@ -21,7 +21,9 @@ export type BackendErrorCode =
     | "INVOICE_EMPTY"
     | "INVALID_INVOICE_TRANSITION"
     | "CURRENCY_MISMATCH"
-    | "INVOICE_INVARIANT_VIOLATION";
+    | "INVOICE_INVARIANT_VIOLATION"
+    | "TRANSACTION_INVARIANT_VIOLATION"
+    | "AFTER_COMMIT_EFFECT_FAILED";
 
 export abstract class BackendError extends Error {
     abstract readonly errorCode: BackendErrorCode;

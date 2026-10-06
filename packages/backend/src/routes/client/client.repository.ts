@@ -1,6 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
 import { withConstraintErrors } from "../../db/constraint-errors.ts";
-import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import { client, clientNameUnique, type Currency } from "../../db/schema/index.ts";
 import {
@@ -23,16 +22,16 @@ export interface UpdateClientRecord {
 }
 
 export class ClientRepository extends DatabaseRepository {
-    list(organizationId: string, executor: DatabaseExecutor = this.database) {
-        return executor
+    list(organizationId: string) {
+        return this.database
             .select()
             .from(client)
             .where(eq(client.organizationId, organizationId))
             .orderBy(asc(client.name));
     }
 
-    async find(organizationId: string, id: string, executor: DatabaseExecutor = this.database) {
-        const [row] = await executor
+    async find(organizationId: string, id: string) {
+        const [row] = await this.database
             .select()
             .from(client)
             .where(and(eq(client.organizationId, organizationId), eq(client.id, id)))
@@ -40,22 +39,17 @@ export class ClientRepository extends DatabaseRepository {
         return row;
     }
 
-    async create(values: CreateClientRecord, executor: DatabaseExecutor = this.database) {
+    async create(values: CreateClientRecord) {
         const [row] = await withConstraintErrors(
-            () => executor.insert(client).values(values).returning(),
+            () => this.database.insert(client).values(values).returning(),
             { [clientNameUnique]: (cause) => new ClientNameTakenError(cause) },
         );
         if (!row) throw new ClientInvariantError("insert returned no row");
         return row;
     }
 
-    async requireUpdate(
-        organizationId: string,
-        id: string,
-        values: UpdateClientRecord,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [row] = await executor
+    async requireUpdate(organizationId: string, id: string, values: UpdateClientRecord) {
+        const [row] = await this.database
             .update(client)
             .set({ ...values, updatedAt: new Date() })
             .where(and(eq(client.organizationId, organizationId), eq(client.id, id)))
@@ -64,12 +58,8 @@ export class ClientRepository extends DatabaseRepository {
         return row;
     }
 
-    async requireArchive(
-        organizationId: string,
-        id: string,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [row] = await executor
+    async requireArchive(organizationId: string, id: string) {
+        const [row] = await this.database
             .update(client)
             .set({ status: "archived", updatedAt: new Date() })
             .where(and(eq(client.organizationId, organizationId), eq(client.id, id)))

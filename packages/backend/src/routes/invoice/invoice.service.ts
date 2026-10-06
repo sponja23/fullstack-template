@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { InvoiceStatus } from "../../db/schema/index.ts";
+import type { TransactionRunner } from "../../db/transaction.ts";
 import { ClientNotFoundError } from "../client/client.errors.ts";
 import type { ClientRepository } from "../client/client.repository.ts";
 import {
@@ -23,6 +24,7 @@ export class InvoiceService {
     constructor(
         private readonly invoices: InvoiceRepository,
         private readonly clients: ClientRepository,
+        private readonly transactions: TransactionRunner,
     ) {}
 
     list(organizationId: string, status?: InvoiceStatus) {
@@ -114,8 +116,8 @@ export class InvoiceService {
     }
 
     issue(organizationId: string, id: string) {
-        return this.invoices.transaction(async (executor) => {
-            const invoice = await this.invoices.find(organizationId, id, executor);
+        return this.transactions.run(async ({ tx }) => {
+            const invoice = await this.invoices.find(organizationId, id, tx);
             if (!invoice) throw new InvoiceNotFoundError();
             if (invoice.status !== "draft") throw new InvoiceNotEditableError();
             if (invoice.lineItems.length === 0) throw new InvoiceEmptyError();
@@ -124,16 +126,16 @@ export class InvoiceService {
                     organizationId,
                     item.id,
                     item.sourceEntryIds,
-                    executor,
+                    tx,
                 );
                 if (claimed !== item.sourceEntryIds.length) throw new TimeEntryBilledError();
             }
-            const number = await this.invoices.allocateNumber(organizationId, executor);
+            const number = await this.invoices.allocateNumber(organizationId, tx);
             return this.invoices.requireTransition(
                 organizationId,
                 id,
                 { status: "issued", number, issuedAt: new Date() },
-                executor,
+                tx,
             );
         });
     }
