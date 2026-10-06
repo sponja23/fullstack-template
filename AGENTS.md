@@ -65,7 +65,7 @@ Avoid tests that mock internal collaborators and assert call shapes. Those tests
 
 Every error product code throws is a named class, defined in the module that throws it; a family several modules throw, or that callers elsewhere catch by class, gets a `*.errors.ts` of its own. The class sets `name`, carries the fields that describe the failure, builds its message from them, and passes a wrapped error as `cause`. Each failure a caller or test must tell apart gets its own class, or a discriminating field (such as `reason`) on a class it shares, so a test asserts the class or that field and never the message.
 
-Product code is the code that ships, so test harnesses, test-support fakes and tooling config are exempt.
+Product code is the code that ships, so test harnesses, test-support fakes and tooling config are exempt, as is generated vendor code such as the shadcn output in `packages/ui`.
 
 ### Logging
 

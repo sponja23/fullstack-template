@@ -8,13 +8,13 @@ export class UnreachableError extends Error {
     readonly value: unknown;
 
     constructor(value: never) {
-        super(`unreachable value: ${describe(value)}`);
+        super(`unreachable value: ${stringifyForMessage(value)}`);
         this.name = "UnreachableError";
         this.value = value;
     }
 }
 
-function describe(value: unknown): string {
+function stringifyForMessage(value: unknown): string {
     try {
         return JSON.stringify(value) ?? String(value);
     } catch {
