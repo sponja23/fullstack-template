@@ -32,8 +32,15 @@ function App() {
     );
 }
 
+class MissingAppRootError extends Error {
+    constructor() {
+        super("#app not found");
+        this.name = "MissingAppRootError";
+    }
+}
+
 const root = document.getElementById("app");
-if (root == null) throw new Error("#app not found");
+if (root == null) throw new MissingAppRootError();
 createRoot(root).render(
     <StrictMode>
         <App />

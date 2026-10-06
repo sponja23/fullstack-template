@@ -1,11 +1,19 @@
 import type { AnyRoute } from "@tanstack/react-router";
 import { routeTree, type FileRoutesById } from "@/routeTree.gen";
 
+/** A story named a file-route ID that the generated route tree does not contain. */
+class StoryRouteNotFoundError extends Error {
+    constructor(readonly id: string) {
+        super(`Story route ${id} was not found`);
+        this.name = "StoryRouteNotFoundError";
+    }
+}
+
 export function storyRoute<TId extends keyof FileRoutesById>(id: TId): FileRoutesById[TId] {
     let originalIndex = 0;
     // File-route IDs and parent links exist only after the generated tree has been initialized.
     const route = findRoute(routeTree, id, () => originalIndex++);
-    if (route === undefined) throw new Error(`Story route ${id} was not found`);
+    if (route === undefined) throw new StoryRouteNotFoundError(id);
     return route as FileRoutesById[TId];
 }
 

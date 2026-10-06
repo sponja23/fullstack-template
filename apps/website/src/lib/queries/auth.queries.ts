@@ -3,6 +3,7 @@ import { authClient } from "@/lib/auth";
 import { unwrapAuthResult } from "@/lib/better-auth";
 import { isSuperadmin } from "@/lib/role";
 import { useAPIMutation } from "./api-queries";
+import { MissingActiveOrganizationError, UnauthenticatedRouteError } from "./queries.errors";
 
 export function sessionQueryOptions() {
     return queryOptions({
@@ -22,7 +23,7 @@ export function ensureSessionData(queryClient: QueryClient) {
 export async function ensureActiveOrganizationId(queryClient: QueryClient): Promise<string> {
     const session = await ensureSessionData(queryClient);
     const organizationId = session?.session.activeOrganizationId;
-    if (organizationId == null) throw new Error("An active organization is required");
+    if (organizationId == null) throw new MissingActiveOrganizationError();
     return organizationId;
 }
 
@@ -40,8 +41,14 @@ export function useAuth() {
 
 export function useUser() {
     const auth = useAuth();
-    if (auth.user == null) throw new Error("useUser requires an authenticated route");
+    if (auth.user == null) throw new UnauthenticatedRouteError();
     return { ...auth, user: auth.user };
+}
+
+export function useActiveOrganizationId() {
+    const { activeOrganizationId } = useUser();
+    if (activeOrganizationId == null) throw new MissingActiveOrganizationError();
+    return activeOrganizationId;
 }
 
 export interface SignInVars {

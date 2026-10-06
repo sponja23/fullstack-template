@@ -8,7 +8,7 @@ import type { TRPCClient } from "@trpc/client";
 import type { UserAppRouter } from "@repo/client";
 import { useTRPCClient } from "@/lib/trpc";
 import { ensureAPIQueryData, useAPIMutation } from "./api-queries";
-import { useUser } from "./auth.queries";
+import { useActiveOrganizationId, useUser } from "./auth.queries";
 
 const listOptions = (organizationId: string, client: TRPCClient<UserAppRouter>) =>
     queryOptions({
@@ -38,9 +38,8 @@ export function ensureInvoicesData(
     return ensureAPIQueryData(queryClient, listOptions(organizationId, client));
 }
 export function useInvoices() {
-    const { activeOrganizationId } = useUser();
+    const activeOrganizationId = useActiveOrganizationId();
     const client = useTRPCClient();
-    if (activeOrganizationId == null) throw new Error("An active organization is required");
     return useSuspenseQuery(listOptions(activeOrganizationId, client));
 }
 export function ensureInvoiceData(
@@ -52,15 +51,13 @@ export function ensureInvoiceData(
     return ensureAPIQueryData(queryClient, detailOptions(organizationId, id, client));
 }
 export function useInvoice(id: string) {
-    const { activeOrganizationId } = useUser();
+    const activeOrganizationId = useActiveOrganizationId();
     const client = useTRPCClient();
-    if (activeOrganizationId == null) throw new Error("An active organization is required");
     return useSuspenseQuery(detailOptions(activeOrganizationId, id, client));
 }
 export function useUnbilledEntries(invoiceId: string) {
-    const { activeOrganizationId } = useUser();
+    const activeOrganizationId = useActiveOrganizationId();
     const client = useTRPCClient();
-    if (activeOrganizationId == null) throw new Error("An active organization is required");
     return useSuspenseQuery(unbilledOptions(activeOrganizationId, invoiceId, client));
 }
 
