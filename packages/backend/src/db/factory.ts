@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema/index.ts";
+import type { Transaction } from "./transaction.ts";
 
 export interface DbConfig {
     connectionString: string;
@@ -13,4 +14,4 @@ export function buildDb(config: DbConfig) {
 
 export type DbBundle = ReturnType<typeof buildDb>;
 export type Database = DbBundle["db"];
-export type DatabaseExecutor = Database | Parameters<Parameters<Database["transaction"]>[0]>[0];
+export type DatabaseExecutor = Database | Transaction;

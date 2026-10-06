@@ -1,5 +1,6 @@
 import type { Auth } from "./auth/factory.ts";
 import type { Database } from "./db/factory.ts";
+import { TransactionRunner } from "./db/transaction.ts";
 import { apiKeyUserRouter } from "./routes/api-key/api-key.user.router.ts";
 import { ClientRepository } from "./routes/client/client.repository.ts";
 import { ClientService } from "./routes/client/client.service.ts";
@@ -33,6 +34,7 @@ export function buildApp({ db, auth }: AppDeps) {
     const { t, router, baseProcedure } = buildTrpc();
     const { authProcedure, orgProcedure } = buildUserProcedures(baseProcedure);
     const { superadminProcedure } = buildSuperadminProcedures(baseProcedure);
+    const transactions = new TransactionRunner(db);
     const organizationDirectoryRepository = new OrganizationDirectoryRepository(db);
     const clientRepository = new ClientRepository(db);
     const projectRepository = new ProjectRepository(db);
@@ -41,7 +43,7 @@ export function buildApp({ db, auth }: AppDeps) {
     const clientService = new ClientService(clientRepository);
     const projectService = new ProjectService(projectRepository, clientRepository);
     const timeEntryService = new TimeEntryService(timeEntryRepository, projectRepository);
-    const invoiceService = new InvoiceService(invoiceRepository, clientRepository);
+    const invoiceService = new InvoiceService(invoiceRepository, clientRepository, transactions);
 
     const userContext: UserRouterContext = { router, authProcedure, orgProcedure };
     const superadminContext: SuperadminRouterContext = { router, superadminProcedure };

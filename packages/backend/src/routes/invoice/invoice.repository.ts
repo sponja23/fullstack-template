@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { DatabaseExecutor } from "../../db/factory.ts";
+import type { Transaction } from "../../db/transaction.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import {
     client,
@@ -43,10 +44,6 @@ const invoiceSelection = {
 };
 
 export class InvoiceRepository extends DatabaseRepository {
-    transaction<T>(callback: (executor: DatabaseExecutor) => Promise<T>) {
-        return this.database.transaction(callback);
-    }
-
     list(
         organizationId: string,
         status?: InvoiceStatus,
@@ -172,9 +169,9 @@ export class InvoiceRepository extends DatabaseRepository {
             );
     }
 
-    async allocateNumber(organizationId: string, executor: DatabaseExecutor) {
-        await executor.insert(invoiceCounter).values({ organizationId }).onConflictDoNothing();
-        const [row] = await executor
+    async allocateNumber(organizationId: string, tx: Transaction) {
+        await tx.insert(invoiceCounter).values({ organizationId }).onConflictDoNothing();
+        const [row] = await tx
             .update(invoiceCounter)
             .set({ next: sql`${invoiceCounter.next} + 1` })
             .where(eq(invoiceCounter.organizationId, organizationId))
@@ -183,14 +180,9 @@ export class InvoiceRepository extends DatabaseRepository {
         return row.number;
     }
 
-    async claimEntries(
-        organizationId: string,
-        itemId: string,
-        ids: string[],
-        executor: DatabaseExecutor,
-    ) {
+    async claimEntries(organizationId: string, itemId: string, ids: string[], tx: Transaction) {
         if (ids.length === 0) return 0;
-        const rows = await executor
+        const rows = await tx
             .update(timeEntry)
             .set({ lineItemId: itemId, updatedAt: new Date() })
             .where(
