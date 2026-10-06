@@ -2,7 +2,7 @@ import { z } from "@hono/zod-openapi";
 import type { RouteRegistrar } from "../http/authenticated-route.ts";
 import type { ClientRecord, ClientsPort } from "./clients.port.ts";
 
-const ClientResource = z
+const clientResourceSchema = z
     .object({
         id: z.string().uuid(),
         name: z.string(),
@@ -14,7 +14,7 @@ const ClientResource = z
     })
     .openapi("Client");
 
-function resource(client: ClientRecord): z.infer<typeof ClientResource> {
+function resource(client: ClientRecord): z.infer<typeof clientResourceSchema> {
     return {
         ...client,
         createdAt: client.createdAt.toISOString(),
@@ -32,7 +32,7 @@ export function registerClientRoutes(register: RouteRegistrar, clients: ClientsP
         responses: {
             200: {
                 description: "The organization's clients.",
-                schema: z.object({ clients: z.array(ClientResource) }),
+                schema: z.object({ clients: z.array(clientResourceSchema) }),
             },
         },
         handler: async ({ principal, reply }) =>
@@ -45,7 +45,7 @@ export function registerClientRoutes(register: RouteRegistrar, clients: ClientsP
         summary: "Get a client",
         tags: ["Clients"],
         request: { params: z.object({ id: z.string().uuid() }) },
-        responses: { 200: { description: "The client.", schema: ClientResource } },
+        responses: { 200: { description: "The client.", schema: clientResourceSchema } },
         errors: { 404: "Client not found." },
         handler: async ({ principal, params, reply }) =>
             reply(200, resource(await clients.get(principal.organizationId, params.id))),

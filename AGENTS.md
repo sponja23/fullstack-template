@@ -16,7 +16,7 @@ Three top-level workspace groups:
 
 ### TypeScript filenames
 
-A dotted filename (`<subject>.<role>.ts[x]`) declares a recognized component or artifact type with a repository-defined convention, such as a service, repository, router, schema, error family, protocol, test, story, or config. Use kebab-case for ordinary descriptive multi-word modules.
+A dotted filename (`<subject>.<role>.ts[x]`) declares a recognized component or artifact type with a repository-defined convention, such as a service, repository, router, schema, error family, protocol, port, adapter, test, story, or config. Use kebab-case for ordinary descriptive multi-word modules.
 
 ## Commands
 
@@ -42,6 +42,8 @@ vp build
 ### Type safety
 
 Schemas are the source of truth at boundaries. Anything crossing a process, network, or storage edge is defined as a Zod schema; the runtime type is derived via `z.infer`. Don't hand-write a parallel type next to a schema.
+
+A schema is a value, so it takes camelCase (`outgoingEmailSchema`); the type derived from it keeps PascalCase (`OutgoingEmail`). The pair is what keeps a value in a type position — `z.infer<typeof outgoingEmailSchema>` — readable as the value it is.
 
 Make illegal states unrepresentable: prefer discriminated unions over flag booleans, and handle the union exhaustively at the consumer; a `switch` that needs a `default` to prove it covered every arm throws `UnreachableError` from `@repo/utils` there.
 

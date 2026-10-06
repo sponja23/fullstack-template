@@ -4,7 +4,7 @@ import z from "zod";
 export const LOG_LEVELS = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
-export const CapturedLogSchema = z.object({
+export const capturedLogSchema = z.object({
     time: z.string(),
     level: z.enum(LOG_LEVELS),
     name: z.string().optional(),
@@ -13,7 +13,7 @@ export const CapturedLogSchema = z.object({
     err: z.unknown().optional(),
 });
 
-export type CapturedLog = z.infer<typeof CapturedLogSchema>;
+export type CapturedLog = z.infer<typeof capturedLogSchema>;
 
 const sinkStore = new AsyncLocalStorage<CapturedLog[]>();
 

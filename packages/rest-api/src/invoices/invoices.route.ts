@@ -3,7 +3,7 @@ import type { RouteRegistrar } from "../http/authenticated-route.ts";
 import type { InvoiceRecord, InvoicesPort } from "./invoices.port.ts";
 
 const statuses = ["draft", "issued", "paid", "void"] as const;
-const LineItemResource = z.object({
+const lineItemResourceSchema = z.object({
     id: z.string().uuid(),
     kind: z.enum(["generated", "manual"]),
     description: z.string(),
@@ -11,7 +11,7 @@ const LineItemResource = z.object({
     unitAmountMinor: z.number().int(),
     totalMinor: z.number().int(),
 });
-const InvoiceResource = z
+const invoiceResourceSchema = z
     .object({
         id: z.string().uuid(),
         clientId: z.string().uuid(),
@@ -26,12 +26,14 @@ const InvoiceResource = z
         createdAt: z.string().datetime(),
         updatedAt: z.string().datetime(),
         totalMinor: z.number().int(),
-        lineItems: z.array(LineItemResource),
+        lineItems: z.array(lineItemResourceSchema),
     })
     .openapi("Invoice");
-const InvoiceSummary = InvoiceResource.omit({ lineItems: true }).openapi("InvoiceSummary");
+const invoiceSummarySchema = invoiceResourceSchema
+    .omit({ lineItems: true })
+    .openapi("InvoiceSummary");
 
-function resource(invoice: InvoiceRecord): z.infer<typeof InvoiceResource> {
+function resource(invoice: InvoiceRecord): z.infer<typeof invoiceResourceSchema> {
     return {
         ...invoice,
         issuedAt: invoice.issuedAt?.toISOString() ?? null,
@@ -62,7 +64,7 @@ export function registerInvoiceRoutes(register: RouteRegistrar, invoices: Invoic
         responses: {
             200: {
                 description: "The organization's invoices.",
-                schema: z.object({ invoices: z.array(InvoiceSummary) }),
+                schema: z.object({ invoices: z.array(invoiceSummarySchema) }),
             },
         },
         handler: async ({ principal, query, reply }) => {
@@ -86,7 +88,7 @@ export function registerInvoiceRoutes(register: RouteRegistrar, invoices: Invoic
         summary: "Get an invoice",
         tags: ["Invoices"],
         request: { params: z.object({ number: z.coerce.number().int().positive() }) },
-        responses: { 200: { description: "The invoice.", schema: InvoiceResource } },
+        responses: { 200: { description: "The invoice.", schema: invoiceResourceSchema } },
         errors: { 404: "Invoice not found." },
         handler: async ({ principal, params, reply }) =>
             reply(
@@ -101,7 +103,7 @@ export function registerInvoiceRoutes(register: RouteRegistrar, invoices: Invoic
         summary: "Mark an invoice paid",
         tags: ["Invoices"],
         request: { params: z.object({ number: z.coerce.number().int().positive() }) },
-        responses: { 200: { description: "The paid invoice.", schema: InvoiceResource } },
+        responses: { 200: { description: "The paid invoice.", schema: invoiceResourceSchema } },
         errors: { 404: "Invoice not found.", 409: "The invoice cannot be marked paid." },
         handler: async ({ principal, params, reply }) =>
             reply(

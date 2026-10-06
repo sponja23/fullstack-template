@@ -1,6 +1,6 @@
 ---
 name: issue-tracker
-description: This repo's GitHub issue conventions. Read before any issue or pull-request operation, including creating, reading, listing, triaging, commenting, labeling, closing, or implementing an issue. Covers parent/sub-issue and blocker relationships, PR closing references, and stacked PRs.
+description: This repo's GitHub issue conventions. Read before any issue or pull-request operation, including creating, reading, listing, triaging, commenting, labeling, closing, or implementing an issue. Covers parent/sub-issue and blocker relationships, Conventional Commits titles for commits and PRs, PR closing references, and stacked PRs.
 ---
 
 # Issue tracker: GitHub
@@ -41,6 +41,15 @@ Model dependencies with GitHub's native `--blocked-by` and `--blocking` flags, n
 ### Reading an issue also reads its blockers
 
 Whenever an issue is blocked, read each blocker automatically using `.blockedBy.nodes[].number` from the canonical read.
+
+## Commit and PR titles
+
+Title every commit and PR with a [Conventional Commits](https://www.conventionalcommits.org/) header: `<type>(<optional scope>): <summary>`, such as `feat(invoices): a draft invoice can be duplicated`.
+
+- Types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`, `revert`.
+- Scope: the area touched, usually the workspace or module name (`backend`, `website`, `rest-api`). Omit it when the change spans the repository.
+- Breaking changes: add `!` before the colon (`feat(backend)!: ...`).
+- The PR title becomes the squash-merge commit, so it follows the same format. The issue number never goes in the title; it goes in the body as `Closes #XXX`.
 
 ## Pull requests that resolve an issue
 
