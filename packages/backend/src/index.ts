@@ -3,7 +3,12 @@ export type { App, AppDeps, UserAppRouter, UserCaller } from "./app.ts";
 export { buildAuth } from "./auth/factory.ts";
 export type { Auth, AuthConfig } from "./auth/factory.ts";
 export type { OrgSession, Session } from "./auth/session.ts";
-export { SUPERADMIN_ROLE, grantSuperadmin, hasSuperadminRole } from "./auth/superadmin.ts";
+export {
+    SUPERADMIN_ROLE,
+    SuperadminUserNotFoundError,
+    grantSuperadmin,
+    hasSuperadminRole,
+} from "./auth/superadmin.ts";
 export type { GrantedSuperadmin } from "./auth/superadmin.ts";
 export { buildDb } from "./db/factory.ts";
 export type { Database, DatabaseExecutor, DbBundle, DbConfig } from "./db/factory.ts";

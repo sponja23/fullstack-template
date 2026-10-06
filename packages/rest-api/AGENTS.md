@@ -29,6 +29,8 @@ API keys carry flat `resource:action` strings from `@repo/backend`'s closed `API
 
 Controllers call a port and let a domain `BackendError` propagate to the app's `onError` in `src/http/backend-error.ts`, which maps it to an HTTP status and returns its `errorCode`. Anything else is an opaque 500.
 
+A 5xx is logged at `error`, which is what operators page on, except a 502: it names an upstream the backend called rather than a fault of ours and is logged at `warn`. So a failure of something the backend depends on belongs on `BadGatewayError`, not `InternalServerError`.
+
 ## Testing
 
 Drive the `OpenAPIHono` through `app.request(...)` with the injected fakes under `test-support/`. Routing, middleware, error mapping, and response shaping remain real; backend integration tests prove the production verifier and service halves.

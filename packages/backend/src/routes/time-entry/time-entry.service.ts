@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { ForbiddenError } from "../../errors/base.ts";
+import { InsufficientPrivilegesError } from "../../errors/base.ts";
 import { ProjectArchivedError, ProjectNotFoundError } from "../project/project.errors.ts";
 import type { ProjectRepository } from "../project/project.repository.ts";
 import { TimeEntryBilledError, TimeEntryNotFoundError } from "./time-entry.errors.ts";
@@ -41,7 +41,7 @@ export class TimeEntryService {
         if (!project) throw new ProjectNotFoundError();
         if (project.status === "archived") throw new ProjectArchivedError();
         const author = await this.entries.findMember(organizationId, userId);
-        if (!author) throw new ForbiddenError();
+        if (!author) throw new InsufficientPrivilegesError();
         const created = await this.entries.create({
             id: randomUUID(),
             organizationId,

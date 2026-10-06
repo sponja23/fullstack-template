@@ -1,4 +1,4 @@
-import { ConflictError, NotFoundError } from "../../errors/base.ts";
+import { ConflictError, InternalServerError, NotFoundError } from "../../errors/base.ts";
 
 export class ProjectNotFoundError extends NotFoundError {
     readonly errorCode = "PROJECT_NOT_FOUND" as const;
@@ -18,5 +18,12 @@ export class ProjectArchivedError extends ConflictError {
     readonly errorCode = "PROJECT_ARCHIVED" as const;
     constructor() {
         super("Archived projects do not accept new time entries");
+    }
+}
+
+export class ProjectInvariantError extends InternalServerError {
+    readonly errorCode = "PROJECT_INVARIANT_VIOLATION" as const;
+    constructor(readonly detail: string) {
+        super(`project invariant violated: ${detail}`);
     }
 }

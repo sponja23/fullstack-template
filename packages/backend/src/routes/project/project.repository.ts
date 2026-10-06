@@ -3,7 +3,11 @@ import { withConstraintErrors } from "../../db/constraint-errors.ts";
 import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import { client, project, projectSlugUnique } from "../../db/schema/index.ts";
-import { ProjectNotFoundError, ProjectSlugTakenError } from "./project.errors.ts";
+import {
+    ProjectInvariantError,
+    ProjectNotFoundError,
+    ProjectSlugTakenError,
+} from "./project.errors.ts";
 
 export interface CreateProjectRecord {
     id: string;
@@ -80,7 +84,7 @@ export class ProjectRepository extends DatabaseRepository {
             () => executor.insert(project).values(values).returning(),
             { [projectSlugUnique]: (cause) => new ProjectSlugTakenError(cause) },
         );
-        if (!created) throw new Error("Project insert returned no row");
+        if (!created) throw new ProjectInvariantError("insert returned no row");
         return created;
     }
 

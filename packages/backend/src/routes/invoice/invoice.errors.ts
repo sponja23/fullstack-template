@@ -1,4 +1,4 @@
-import { ConflictError, NotFoundError } from "../../errors/base.ts";
+import { ConflictError, InternalServerError, NotFoundError } from "../../errors/base.ts";
 
 export class InvoiceNotFoundError extends NotFoundError {
     readonly errorCode = "INVOICE_NOT_FOUND" as const;
@@ -32,5 +32,12 @@ export class CurrencyMismatchError extends ConflictError {
     readonly errorCode = "CURRENCY_MISMATCH" as const;
     constructor() {
         super("Time entries must belong to the invoice client and currency");
+    }
+}
+
+export class InvoiceInvariantError extends InternalServerError {
+    readonly errorCode = "INVOICE_INVARIANT_VIOLATION" as const;
+    constructor(readonly detail: string) {
+        super(`invoice invariant violated: ${detail}`);
     }
 }

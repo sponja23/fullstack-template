@@ -1,6 +1,6 @@
 import { count } from "drizzle-orm";
 import { expect } from "vitest";
-import { grantSuperadmin } from "../../src/auth/superadmin.ts";
+import { grantSuperadmin, SuperadminUserNotFoundError } from "../../src/auth/superadmin.ts";
 import { member, organization } from "../../src/db/schema/index.ts";
 import { FakeEmailSender } from "../fake-email-sender.ts";
 import { cookieHeaderFromResponse } from "../harness.ts";
@@ -132,6 +132,13 @@ apiTestSuite({
             const verified = await harness.auth.api.verifyApiKey({ body: { key: issued.key } });
             expect(verified.valid).toBe(true);
             expect(verified.key?.referenceId).toBe(harness.organizationId);
+        });
+
+        test("refuses to grant superadmin to an unknown email", async ({ harness }) => {
+            await expect(grantSuperadmin(harness.db, "nobody@example.com")).rejects.toMatchObject({
+                constructor: SuperadminUserNotFoundError,
+                email: "nobody@example.com",
+            });
         });
 
         test("grants superadmin and impersonates another user", async ({ harness, request }) => {

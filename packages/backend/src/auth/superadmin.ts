@@ -1,6 +1,14 @@
 import { eq } from "drizzle-orm";
 import { user } from "../db/schema/auth.schema.ts";
 import type { Database } from "../db/factory.ts";
+import { NotFoundError } from "../errors/base.ts";
+
+export class SuperadminUserNotFoundError extends NotFoundError {
+    readonly errorCode = "SUPERADMIN_USER_NOT_FOUND" as const;
+    constructor(readonly email: string) {
+        super(`No user found with email ${email}`);
+    }
+}
 
 export const SUPERADMIN_ROLE = "superadmin";
 
@@ -24,6 +32,6 @@ export async function grantSuperadmin(db: Database, email: string): Promise<Gran
         .set({ role: SUPERADMIN_ROLE })
         .where(eq(user.email, email))
         .returning({ id: user.id, email: user.email });
-    if (!granted) throw new Error(`No user found with email ${email}`);
+    if (!granted) throw new SuperadminUserNotFoundError(email);
     return granted;
 }

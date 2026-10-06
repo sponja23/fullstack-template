@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Auth } from "../../auth/factory.ts";
-import { ForbiddenError } from "../../errors/base.ts";
+import { InsufficientPrivilegesError } from "../../errors/base.ts";
 import { type UserRouterBuilder, type UserRouterContext } from "../../trpc/user.procedures.ts";
 import { apiScopeSchema, scopesFromMetadata } from "./api-key.scopes.ts";
 
@@ -12,7 +12,7 @@ async function requireOwner(auth: Auth, headers: Headers, organizationId: string
         query: { organizationId },
     });
     if (!role.split(",").some((value) => value.trim() === "owner")) {
-        throw new ForbiddenError("Only organization owners can manage API keys");
+        throw new InsufficientPrivilegesError("Only organization owners can manage API keys");
     }
 }
 
