@@ -43,7 +43,7 @@ vp build
 
 Schemas are the source of truth at boundaries. Anything crossing a process, network, or storage edge is defined as a Zod schema; the runtime type is derived via `z.infer`. Don't hand-write a parallel type next to a schema.
 
-Make illegal states unrepresentable: prefer discriminated unions over flag booleans, and handle the union exhaustively at the consumer.
+Make illegal states unrepresentable: prefer discriminated unions over flag booleans, and handle the union exhaustively at the consumer; a `switch` that needs a `default` to prove it covered every arm throws `UnreachableError` from `@repo/utils` there.
 
 `any`, `!`, and `as` are escape hatches — discouraged by default but acceptable when the alternative is worse. Use judgment.
 
@@ -60,6 +60,12 @@ This lets tests substitute real-but-disposable resources such as a fresh Postgre
 Tests exercise real behavior. When dependencies are heavy, use real-but-disposable substitutes. Fakes are acceptable for capabilities that cannot run locally, as long as the code under test stays unchanged.
 
 Avoid tests that mock internal collaborators and assert call shapes. Those tests couple to implementation and break on refactors without proving behavior.
+
+### Errors
+
+Every error product code throws is a named class, defined in the module that throws it; a family several modules throw, or that callers elsewhere catch by class, gets a `*.errors.ts` of its own. The class sets `name`, carries the fields that describe the failure, builds its message from them, and passes a wrapped error as `cause`. Each failure a caller or test must tell apart gets its own class, or a discriminating field (such as `reason`) on a class it shares, so a test asserts the class or that field and never the message.
+
+Product code is the code that ships, so test harnesses, test-support fakes and tooling config are exempt.
 
 ### Logging
 
