@@ -4,7 +4,7 @@ import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { type ApiEnv, apiKeyAuth, requireScope } from "../auth/api-key.middleware.ts";
 import type { ApiKeyVerifier, ApiPrincipal } from "../auth/api-key-verifier.ts";
-import { ErrorResponse } from "./error-response.ts";
+import { errorResponseSchema } from "./error-response.ts";
 
 interface SuccessSpec {
     description: string;
@@ -44,7 +44,7 @@ export interface RouteSpec<
 
 const jsonError = (description: string) => ({
     description,
-    content: { "application/json": { schema: ErrorResponse } },
+    content: { "application/json": { schema: errorResponseSchema } },
 });
 
 export function createRouteRegistrar(app: OpenAPIHono<ApiEnv>, verifier: ApiKeyVerifier) {

@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Auth } from "../../auth/factory.ts";
 import { InsufficientPrivilegesError } from "../../errors/base.ts";
 import { type UserRouterBuilder, type UserRouterContext } from "../../trpc/user.procedures.ts";
-import { apiScopeSchema, scopesFromMetadata } from "./api-key.scopes.ts";
+import { apiScopeSchema, scopesFromMetadata } from "./api-key-scopes.ts";
 
 export type ApiKeyUserRouterDeps = UserRouterContext;
 

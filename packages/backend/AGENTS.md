@@ -21,7 +21,7 @@ Each domain resource lives under `src/routes/<resource>/` with up to three layer
 
 Split repositories by table and owner; group by feature at the service and router layers.
 
-For an update that returns no row, read the `WHERE` clause before assigning meaning: an identity-only predicate means the row is gone and the repository may assert that domain error, while a guarded predicate conflates absence with a guard that fired and must remain an asking operation for its caller to interpret.
+For an update that returns no row, read the `WHERE` clause before assigning meaning: an identity-only predicate means the row is gone and the repository may assert that domain error, while a guarded predicate conflates absence with a guard that fired and must remain an asking operation for its caller to interpret. `docs/adr/0001-the-repository-maps-database-signals-to-domain-errors.md` records why these translations belong to the repository.
 
 Capabilities owned by better-auth are used directly. When auth configuration needs application data, inject a predicate or port instead of querying inside `buildAuth`. Invitation delivery through `EmailSender` is the local example. A read-only model over auth tables is acceptable when no API exposes the query; it never writes those tables.
 
