@@ -1,4 +1,9 @@
-import { ConflictError, InternalServerError, NotFoundError } from "../../errors/base.ts";
+import {
+    ConflictError,
+    ForbiddenError,
+    InternalServerError,
+    NotFoundError,
+} from "../../errors/base.ts";
 
 export class TimeEntryNotFoundError extends NotFoundError {
     readonly errorCode = "TIME_ENTRY_NOT_FOUND" as const;
@@ -11,6 +16,16 @@ export class TimeEntryBilledError extends ConflictError {
     readonly errorCode = "TIME_ENTRY_BILLED" as const;
     constructor() {
         super("Billed time entries cannot be changed");
+    }
+}
+
+export class NotOrganizationMemberError extends ForbiddenError {
+    readonly errorCode = "NOT_ORGANIZATION_MEMBER" as const;
+    constructor(
+        readonly organizationId: string,
+        readonly userId: string,
+    ) {
+        super(`User ${userId} is not a member of organization ${organizationId}`);
     }
 }
 

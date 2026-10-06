@@ -1,10 +1,15 @@
 import { TRPCError } from "@trpc/server";
 import type { TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
+import { z } from "zod";
 
 export type BackendErrorCode =
     | "UNAUTHORIZED"
-    | "FORBIDDEN"
+    | "NOT_ORGANIZATION_OWNER"
+    | "NOT_ORGANIZATION_MEMBER"
+    | "NOT_SUPERADMIN"
     | "BAD_REQUEST"
+    | "NO_ACTIVE_ORGANIZATION"
+    | "MALFORMED_JSON_BODY"
     | "SUPERADMIN_USER_NOT_FOUND"
     | "CLIENT_NOT_FOUND"
     | "CLIENT_NAME_TAKEN"
@@ -69,22 +74,15 @@ export abstract class BadGatewayError extends BackendError {
 
 export class UnauthenticatedError extends UnauthorizedError {
     readonly errorCode = "UNAUTHORIZED" as const;
-    constructor(message = "Unauthorized") {
-        super(message);
+    constructor() {
+        super("Authentication required");
     }
 }
 
-export class InsufficientPrivilegesError extends ForbiddenError {
-    readonly errorCode = "FORBIDDEN" as const;
-    constructor(message = "Forbidden") {
-        super(message);
-    }
-}
-
-/** The request is well-formed at the transport level but its inputs are invalid. */
+/** The request is well-formed at the transport level but fails its schema. */
 export class InvalidInputError extends BadRequestError {
     readonly errorCode = "BAD_REQUEST" as const;
-    constructor(message: string, options?: ErrorOptions) {
-        super(message, options);
+    constructor(readonly validation: z.ZodError) {
+        super(z.prettifyError(validation), { cause: validation });
     }
 }

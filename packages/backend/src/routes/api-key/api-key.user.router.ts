@@ -1,10 +1,17 @@
 import { z } from "zod";
 import type { Auth } from "../../auth/factory.ts";
-import { InsufficientPrivilegesError } from "../../errors/base.ts";
+import { ForbiddenError } from "../../errors/base.ts";
 import { type UserRouterBuilder, type UserRouterContext } from "../../trpc/user.procedures.ts";
 import { apiScopeSchema, scopesFromMetadata } from "./api-key-scopes.ts";
 
 export type ApiKeyUserRouterDeps = UserRouterContext;
+
+export class NotOrganizationOwnerError extends ForbiddenError {
+    readonly errorCode = "NOT_ORGANIZATION_OWNER" as const;
+    constructor(readonly organizationId: string) {
+        super(`Only owners of organization ${organizationId} can manage its API keys`);
+    }
+}
 
 async function requireOwner(auth: Auth, headers: Headers, organizationId: string) {
     const { role } = await auth.api.getActiveMemberRole({
@@ -12,7 +19,7 @@ async function requireOwner(auth: Auth, headers: Headers, organizationId: string
         query: { organizationId },
     });
     if (!role.split(",").some((value) => value.trim() === "owner")) {
-        throw new InsufficientPrivilegesError("Only organization owners can manage API keys");
+        throw new NotOrganizationOwnerError(organizationId);
     }
 }
 
