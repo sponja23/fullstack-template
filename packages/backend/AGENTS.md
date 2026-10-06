@@ -15,8 +15,8 @@
 
 Each domain resource lives under `src/routes/<resource>/` with up to three layers:
 
-- Repository (`*.repository.ts`) is the only layer touching the database. It extends `DatabaseRepository`. A method's final parameter says where it runs: one that must run inside a transaction takes a required `tx: Transaction`, which the pool does not satisfy; one sometimes called inside a transaction takes a defaulted `executor: DatabaseExecutor = this.database`; one no caller runs inside a transaction takes neither. The repository translates database signals only it can decode into domain errors. Method names carry absence semantics: `find*`/`resolve*` ask and return a total value, while `require*` asserts and throws; add a `require*` only when every caller of the asking form already performs the same throw.
-- Service (`*.service.ts`) owns domain logic and orchestrates repositories. It owns transactions through the injected `TransactionRunner` from `db/transaction.ts` and never holds `Database`: `this.transactions.run(scope => …)` opens a top-level transaction, and repositories receive only `scope.tx`. A service method meant to run inside its caller's transaction takes the caller's `TxScope` rather than opening one, since a nested `run` commits on its own. Work that must follow the commit registers itself with `scope.afterCommit(effect)` where the work is recorded, so a rollback runs none of it; effects run in order once the transaction commits, and if any fail the run rejects with `AfterCommitEffectError` after the rest have run.
+- Repository (`*.repository.ts`) is the only layer touching the database. It extends `DatabaseRepository`. A method that must run in a transaction takes `tx: Transaction`; one sometimes called in one takes `executor: DatabaseExecutor = this.database`. The repository translates database signals only it can decode into domain errors. Method names carry absence semantics: `find*`/`resolve*` ask and return a total value, while `require*` asserts and throws; add a `require*` only when every caller of the asking form already performs the same throw.
+- Service (`*.service.ts`) owns domain logic and orchestrates repositories. It opens transactions with the injected `TransactionRunner` (`db/transaction.ts`) and registers post-commit work with `scope.afterCommit`.
 - Router (`*.<principal>.router.ts`) validates with Zod, calls one service method, and returns the result. Declare builders with `satisfies <Principal>RouterBuilder<Deps>`.
 
 Split repositories by table and owner; group by feature at the service and router layers.
@@ -42,7 +42,7 @@ Choose the narrowest procedure that guarantees a resolver's context. Build new p
 
 ## Dependency injection
 
-`buildApp` constructs the graph once: repositories take the database, services take repositories, services that open transactions also take the shared `TransactionRunner`, and routers take services and procedures. It returns routers, the context factory, and typed caller factories for tests and scripts.
+`buildApp` constructs the graph once: repositories take the database, services take repositories, and routers take services and procedures. It returns routers, the context factory, and typed caller factories for tests and scripts.
 
 Environment is read only in `apps/api/src/env.ts`; the parsed values enter `buildDb`, `buildAuth`, and `buildApp`. The backend stays Hono-free. `apps/api/src/server.ts` owns HTTP and concrete adapters.
 
