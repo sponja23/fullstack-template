@@ -1,1 +1,1 @@
-export { errMessage } from "./errors.ts";
+export { errMessage, UnreachableError } from "./errors.ts";

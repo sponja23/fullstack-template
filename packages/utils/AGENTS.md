@@ -2,7 +2,7 @@
 
 A last-resort home for tiny, dependency-free, general-purpose helpers with no better owner.
 
-This package is the leaf of the dependency graph: it has zero dependencies and every export is a pure, environment-agnostic function. The moment a helper needs a dependency, reaches for a runtime API, or encodes a domain concept, it belongs elsewhere.
+This package is the leaf of the dependency graph: it has zero dependencies and every export is a pure, environment-agnostic function or error class. The moment a helper needs a dependency, reaches for a runtime API, or encodes a domain concept, it belongs elsewhere.
 
 ## Adding to this package requires explicit user sign-off
 
@@ -17,3 +17,4 @@ Before proposing an addition, exhaust the alternatives:
 ## Contents
 
 - `errMessage(unknown): string` earns its place because it recurs across unrelated packages: it returns an `Error`'s message or the value's string representation. It does not log; logging a caught value goes directly to `@repo/logger`.
+- `UnreachableError` is thrown from a `switch`'s `default` once every arm is handled; its constructor takes `never`, so a new arm the switch misses fails to type-check.
