@@ -21,7 +21,7 @@ Each domain resource lives under `src/routes/<resource>/` with up to three layer
 
 Split repositories by table and owner; group by feature at the service and router layers.
 
-For an update that returns no row, read the `WHERE` clause before assigning meaning: an identity-only predicate means the row is gone and the repository may assert that domain error, while a guarded predicate conflates absence with a guard that fired and must remain an asking operation for its caller to interpret. `docs/adr/0001-the-repository-maps-database-signals-to-domain-errors.md` records why these translations belong to the repository.
+For an update that returns no row, read the `WHERE` clause before assigning meaning: an identity-only predicate means the row is gone and the repository may assert that domain error, while a guarded predicate conflates absence with a guard that fired and must remain an asking operation for its caller to interpret.
 
 Capabilities owned by better-auth are used directly. When auth configuration needs application data, inject a predicate or port instead of querying inside `buildAuth`. Invitation delivery through `EmailSender` is the local example. A read-only model over auth tables is acceptable when no API exposes the query; it never writes those tables.
 
@@ -54,7 +54,7 @@ The root Errors rule applies, and every backend error extends `BackendError` in 
 
 A check for a state the code guarantees can't occur throws an `InternalServerError` subclass with its area's `<AREA>_INVARIANT_VIOLATION` code, like `INVOICE_INVARIANT_VIOLATION`. A failure of an upstream service the backend calls goes on a `BadGatewayError` subclass, not an `InternalServerError`, so it is not reported as a fault of ours.
 
-A repository write whose named Postgres constraint should surface as a domain error wraps only that statement with `withConstraintErrors(write, mapping)` from `db/constraint-errors.ts`. Export each mapped constraint name as a `const` from its schema module and use it both in the Drizzle declaration and as the mapping key. The helper rethrows the mapped domain error with the driver error as its cause; it never returns a violation from inside a transaction. Constraints that represent internal invariants remain unmapped and surface as 500s. `docs/adr/0001-the-repository-maps-database-signals-to-domain-errors.md` records why the mapping lives at the statement.
+A repository write whose named Postgres constraint should surface as a domain error wraps only that statement with `withConstraintErrors(write, mapping)` from `db/constraint-errors.ts`. Export each mapped constraint name as a `const` from its schema module and use it both in the Drizzle declaration and as the mapping key. The helper rethrows the mapped domain error with the driver error as its cause; it never returns a violation from inside a transaction. Constraints that represent internal invariants remain unmapped and surface as 500s.
 
 ## Logging and telemetry
 
