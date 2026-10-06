@@ -1,6 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
-import type { DatabaseExecutor } from "../../db/factory.ts";
-import type { Transaction } from "../../db/transaction.ts";
+import type { DatabaseExecutor, Transaction } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import {
     client,
@@ -44,12 +43,8 @@ const invoiceSelection = {
 };
 
 export class InvoiceRepository extends DatabaseRepository {
-    list(
-        organizationId: string,
-        status?: InvoiceStatus,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        return executor
+    list(organizationId: string, status?: InvoiceStatus) {
+        return this.database
             .select({
                 ...invoiceSelection,
                 totalMinor: sql<number>`coalesce((select sum(${lineItem.totalMinor}) from ${lineItem} where ${lineItem.invoiceId} = ${invoice.id}), 0)::int`,
@@ -75,53 +70,43 @@ export class InvoiceRepository extends DatabaseRepository {
         return { ...row, lineItems: await this.listLines(id, executor) };
     }
 
-    async findByNumber(
-        organizationId: string,
-        number: number,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [row] = await executor
+    async findByNumber(organizationId: string, number: number) {
+        const [row] = await this.database
             .select(invoiceSelection)
             .from(invoice)
             .innerJoin(client, eq(invoice.clientId, client.id))
             .where(and(eq(invoice.organizationId, organizationId), eq(invoice.number, number)))
             .limit(1);
         if (!row) return undefined;
-        return { ...row, lineItems: await this.listLines(row.id, executor) };
+        return { ...row, lineItems: await this.listLines(row.id, this.database) };
     }
 
-    async createDraft(
-        values: { id: string; organizationId: string; clientId: string; currency: Currency },
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [draft] = await executor.insert(invoice).values(values).returning();
+    async createDraft(values: {
+        id: string;
+        organizationId: string;
+        clientId: string;
+        currency: Currency;
+    }) {
+        const [draft] = await this.database.insert(invoice).values(values).returning();
         if (!draft) throw new InvoiceInvariantError("insert returned no row");
         return draft;
     }
 
-    async addLine(values: CreateLineItemRecord, executor: DatabaseExecutor = this.database) {
-        const [row] = await executor.insert(lineItem).values(values).returning();
+    async addLine(values: CreateLineItemRecord) {
+        const [row] = await this.database.insert(lineItem).values(values).returning();
         return row;
     }
 
-    async removeLine(
-        invoiceId: string,
-        lineItemId: string,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [row] = await executor
+    async removeLine(invoiceId: string, lineItemId: string) {
+        const [row] = await this.database
             .delete(lineItem)
             .where(and(eq(lineItem.invoiceId, invoiceId), eq(lineItem.id, lineItemId)))
             .returning({ id: lineItem.id });
         return row;
     }
 
-    listUnbilledForClient(
-        organizationId: string,
-        clientId: string,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        return executor
+    listUnbilledForClient(organizationId: string, clientId: string) {
+        return this.database
             .select({
                 id: timeEntry.id,
                 projectId: project.id,
@@ -143,13 +128,9 @@ export class InvoiceRepository extends DatabaseRepository {
             .orderBy(asc(project.name), asc(timeEntry.date));
     }
 
-    findUnbilledEntries(
-        organizationId: string,
-        ids: string[],
-        executor: DatabaseExecutor = this.database,
-    ) {
+    findUnbilledEntries(organizationId: string, ids: string[]) {
         if (ids.length === 0) return Promise.resolve([]);
-        return executor
+        return this.database
             .select({
                 id: timeEntry.id,
                 projectId: project.id,

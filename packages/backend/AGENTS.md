@@ -42,7 +42,7 @@ Choose the narrowest procedure that guarantees a resolver's context. Build new p
 
 ## Dependency injection
 
-`buildApp` constructs the graph once: repositories take the database, services take repositories and the shared `TransactionRunner`, and routers take services and procedures. It returns routers, the context factory, and typed caller factories for tests and scripts.
+`buildApp` constructs the graph once: repositories take the database, services take repositories, services that open transactions also take the shared `TransactionRunner`, and routers take services and procedures. It returns routers, the context factory, and typed caller factories for tests and scripts.
 
 Environment is read only in `apps/api/src/env.ts`; the parsed values enter `buildDb`, `buildAuth`, and `buildApp`. The backend stays Hono-free. `apps/api/src/server.ts` owns HTTP and concrete adapters.
 

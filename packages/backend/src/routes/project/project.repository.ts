@@ -1,6 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
 import { withConstraintErrors } from "../../db/constraint-errors.ts";
-import type { DatabaseExecutor } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
 import { client, project, projectSlugUnique } from "../../db/schema/index.ts";
 import {
@@ -39,8 +38,8 @@ const selection = {
 };
 
 export class ProjectRepository extends DatabaseRepository {
-    list(organizationId: string, clientId?: string, executor: DatabaseExecutor = this.database) {
-        return executor
+    list(organizationId: string, clientId?: string) {
+        return this.database
             .select(selection)
             .from(project)
             .innerJoin(client, eq(project.clientId, client.id))
@@ -55,8 +54,8 @@ export class ProjectRepository extends DatabaseRepository {
             .orderBy(asc(project.name));
     }
 
-    async findById(organizationId: string, id: string, executor: DatabaseExecutor = this.database) {
-        const [row] = await executor
+    async findById(organizationId: string, id: string) {
+        const [row] = await this.database
             .select(selection)
             .from(project)
             .innerJoin(client, eq(project.clientId, client.id))
@@ -65,12 +64,8 @@ export class ProjectRepository extends DatabaseRepository {
         return row;
     }
 
-    async findBySlug(
-        organizationId: string,
-        slug: string,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [row] = await executor
+    async findBySlug(organizationId: string, slug: string) {
+        const [row] = await this.database
             .select(selection)
             .from(project)
             .innerJoin(client, eq(project.clientId, client.id))
@@ -79,44 +74,35 @@ export class ProjectRepository extends DatabaseRepository {
         return row;
     }
 
-    async create(values: CreateProjectRecord, executor: DatabaseExecutor = this.database) {
+    async create(values: CreateProjectRecord) {
         const [created] = await withConstraintErrors(
-            () => executor.insert(project).values(values).returning(),
+            () => this.database.insert(project).values(values).returning(),
             { [projectSlugUnique]: (cause) => new ProjectSlugTakenError(cause) },
         );
         if (!created) throw new ProjectInvariantError("insert returned no row");
         return created;
     }
 
-    async requireUpdate(
-        organizationId: string,
-        id: string,
-        values: UpdateProjectRecord,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [updated] = await executor
+    async requireUpdate(organizationId: string, id: string, values: UpdateProjectRecord) {
+        const [updated] = await this.database
             .update(project)
             .set({ ...values, updatedAt: new Date() })
             .where(and(eq(project.organizationId, organizationId), eq(project.id, id)))
             .returning({ id: project.id });
         if (!updated) throw new ProjectNotFoundError();
-        const projectRow = await this.findById(organizationId, updated.id, executor);
+        const projectRow = await this.findById(organizationId, updated.id);
         if (!projectRow) throw new ProjectNotFoundError();
         return projectRow;
     }
 
-    async requireArchive(
-        organizationId: string,
-        id: string,
-        executor: DatabaseExecutor = this.database,
-    ) {
-        const [updated] = await executor
+    async requireArchive(organizationId: string, id: string) {
+        const [updated] = await this.database
             .update(project)
             .set({ status: "archived", updatedAt: new Date() })
             .where(and(eq(project.organizationId, organizationId), eq(project.id, id)))
             .returning({ id: project.id });
         if (!updated) throw new ProjectNotFoundError();
-        const projectRow = await this.findById(organizationId, updated.id, executor);
+        const projectRow = await this.findById(organizationId, updated.id);
         if (!projectRow) throw new ProjectNotFoundError();
         return projectRow;
     }

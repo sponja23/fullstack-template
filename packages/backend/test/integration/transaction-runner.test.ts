@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { expect } from "vitest";
+import type { Transaction } from "../../src/db/factory.ts";
 import { client } from "../../src/db/schema/index.ts";
 import {
     AfterCommitEffectError,
     TransactionInvariantError,
     TransactionRunner,
-    type Transaction,
     type TxScope,
 } from "../../src/db/transaction.ts";
 import type { TestHarness } from "../harness.ts";
@@ -97,7 +97,10 @@ apiTestSuite({
             });
 
             await expect(run).rejects.toBeInstanceOf(AfterCommitEffectError);
-            await expect(run).rejects.toMatchObject({ failedEffects: 2, cause: first });
+            await expect(run).rejects.toMatchObject({
+                failures: [first, expect.any(Error)],
+                cause: first,
+            });
             expect(ran).toEqual(["second"]);
             expect(await clientExists(harness, id)).toBe(true);
         });

@@ -1,6 +1,6 @@
 import { logger } from "@repo/logger";
 import { InternalServerError } from "../errors/base.ts";
-import type { Database } from "./factory.ts";
+import type { Database, Transaction } from "./factory.ts";
 
 /** An after-commit effect was registered once its transaction had already settled. */
 export class TransactionInvariantError extends InternalServerError {
@@ -13,16 +13,10 @@ export class TransactionInvariantError extends InternalServerError {
 /** The transaction committed, but at least one of its after-commit effects failed. */
 export class AfterCommitEffectError extends InternalServerError {
     readonly errorCode = "AFTER_COMMIT_EFFECT_FAILED" as const;
-    constructor(
-        readonly failedEffects: number,
-        cause: unknown,
-    ) {
-        super(`${failedEffects} after-commit effect(s) failed`, { cause });
+    constructor(readonly failures: readonly unknown[]) {
+        super(`${failures.length} after-commit effect(s) failed`, { cause: failures[0] });
     }
 }
-
-/** Drizzle's transaction handle; the pool is not assignable to it, so a parameter of this type proves the caller holds a transaction. */
-export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 export type AfterCommitEffect = () => Promise<void>;
 
@@ -64,7 +58,7 @@ export class TransactionRunner {
                 failures.push(error);
             }
         }
-        if (failures.length > 0) throw new AfterCommitEffectError(failures.length, failures[0]);
+        if (failures.length > 0) throw new AfterCommitEffectError(failures);
         return result;
     }
 }
