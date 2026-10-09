@@ -1,6 +1,6 @@
 ---
 name: issue-tracker
-description: This repo's GitHub issue conventions. Read before any issue or pull-request operation, including creating, reading, listing, triaging, commenting, labeling, closing, or implementing an issue. Covers parent/sub-issue and blocker relationships, Conventional Commits titles for commits and PRs, PR closing references, and stacked PRs.
+description: This repo's GitHub issue conventions. Read before any issue or pull-request operation, including creating, reading, listing, triaging, commenting, labeling, closing, or implementing an issue. Covers parent/sub-issue and blocker relationships, Conventional Commits titles for commits and PRs, PR closing references, stacked PRs, and `/wayfinder` maps.
 ---
 
 # Issue tracker: GitHub
@@ -58,6 +58,17 @@ A PR that fully resolves an issue includes `Closes #XXX` on its own line. Use on
 ## Stacked PRs (`gh stack`)
 
 Use `gh stack` when one logical change forms a natural chain too large for one reviewable PR. Its commands manage a PR chain, not issue hierarchy or issue dependencies. Use separate PRs for unrelated work and native issue dependencies for ordering.
+
+## Wayfinding operations
+
+Used by `/wayfinder`. The map is one issue labelled `wayfinder:map`, and its tickets are its sub-issues.
+
+- Map: `gh issue create --label wayfinder:map --title "..." --body "..."`, with Notes, Decisions so far, and Fog sections in the body.
+- Ticket: create it under the map with `--parent <map-number>` and label it `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, or `wayfinder:task`.
+- Blocking: record edges between tickets with the native dependency flags above.
+- Frontier: the map's open sub-issues that have no assignee and no open blocker; check each `blockedBy` issue's state, since closed blockers no longer gate. The first in map order wins.
+- Claim: `gh issue edit <number> --add-assignee @me`, as the session's first write.
+- Resolve: comment the answer, close the ticket, then append a one-line gist and link to the map's Decisions so far.
 
 ## When a skill says "publish to the issue tracker"
 
