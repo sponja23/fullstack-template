@@ -30,7 +30,7 @@ Seams the grep does not name: the dashboard route's `beforeLoad` (it reconciles 
 - `apps/website/AGENTS.md`: the sentence listing what Better Auth owns.
 - `apps/website/src/lib/queries/AGENTS.md`: organization-scoped cache keys, `setActiveOrganization`, and the identity-change paragraph's organization steps.
 - `apps/website/src/routes/_authenticated/_shell/AGENTS.md`: the whole active-organization section; keep "navigate before you invalidate" for sign-out.
-- `CONTEXT.md`: Organization becomes User, "the tenant; every domain row belongs to exactly one".
+- `GLOSSARY.md`: Organization becomes User, "the tenant; every domain row belongs to exactly one".
 
 ## Verify
 

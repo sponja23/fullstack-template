@@ -106,7 +106,7 @@ Five canonical triage-state labels map to their own names. See `docs/agents/tria
 
 ### Domain docs
 
-Single-context projects use `CONTEXT.md` and `docs/adr/`, created lazily. See `docs/agents/domain.md`.
+Single-context projects use `GLOSSARY.md` and `docs/adr/`, created lazily. See `docs/agents/domain.md`.
 
 ### Workflow skills
 
