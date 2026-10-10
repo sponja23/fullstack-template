@@ -14,4 +14,4 @@ When a skill mentions a role, use the corresponding label string from this table
 
 These five labels track an issue's triage state. They are orthogonal to the `bug`, `feature`, and `refactor` classification labels, which describe the kind of work.
 
-Edit the right-hand column to match the vocabulary in the issue tracker.
+Edit the "Label in our tracker" column to match the vocabulary in the issue tracker.

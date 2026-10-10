@@ -15,7 +15,7 @@ A template for full-stack TypeScript web applications: a pnpm monorepo with a tR
 | `packages/logger`, `packages/telemetry` | Structured logging and OpenTelemetry tracing.                                                                            |
 | `tools/storybook`                       | The catalog that renders every UI primitive and every website route without a backend.                                   |
 
-The example product is an invoicing app: an organization has clients, projects, and time entries, and issues invoices from them. Its vocabulary is in [CONTEXT.md](./CONTEXT.md). A new project deletes it and builds its own domain in its place.
+The example product is an invoicing app: an organization has clients, projects, and time entries, and issues invoices from them. Its vocabulary is in [GLOSSARY.md](./GLOSSARY.md). A new project deletes it and builds its own domain in its place.
 
 ## Running it
 

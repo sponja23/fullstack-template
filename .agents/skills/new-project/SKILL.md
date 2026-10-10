@@ -39,7 +39,7 @@ Infer the additions the description implies in the same pass (files mean object 
 
 Before deleting, read one slice end to end as the worked example for every slice this project will write: the client's schema, repository, service, errors, router, query hooks, routes, forms, stories, tests, and REST port. The layer conventions live in the `AGENTS.md` chain, not here.
 
-Then delete the invoicing domain: the `client`, `project`, `time-entry`, and `invoice` slices under `packages/backend/src/routes/`, their schema module and its re-exports, their wiring in `buildApp` and the `services` it returns, the `clients` and `invoices` REST resources with their ports and fakes, the website routes, query modules, and forms for clients, projects, time, and invoices, the dashboard's sidebar links and its index redirect, the Storybook worlds' domain handlers and the deleted routes' stories, the domain terms in `CONTEXT.md`, and their tests. Search for the deleted vocabulary until nothing references it. Completion: `pnpm ready` passes with only the skeleton left (auth, settings, superadmin, REST health and whoami).
+Then delete the invoicing domain: the `client`, `project`, `time-entry`, and `invoice` slices under `packages/backend/src/routes/`, their schema module and its re-exports, their wiring in `buildApp` and the `services` it returns, the `clients` and `invoices` REST resources with their ports and fakes, the website routes, query modules, and forms for clients, projects, time, and invoices, the dashboard's sidebar links and its index redirect, the Storybook worlds' domain handlers and the deleted routes' stories, the domain terms in `GLOSSARY.md`, and their tests. Search for the deleted vocabulary until nothing references it. Completion: `pnpm ready` passes with only the skeleton left (auth, settings, superadmin, REST health and whoami).
 
 ## 5. Apply the chosen recipes
 
@@ -100,7 +100,7 @@ This skill describes a project that no longer exists once the steps above are do
 
 ## 10. Build the domain
 
-Hand the description from step 1 to the `grill-with-docs` skill. It produces `CONTEXT.md` and the first entries under `docs/adr/`, which the empty directory exists for. Slices then follow the layer docs: `packages/backend/AGENTS.md`, `apps/website/AGENTS.md` and the query and form docs beneath it, and the `storybook` skill.
+Hand the description from step 1 to the `grill-with-docs` skill. It produces `GLOSSARY.md` and the first entries under `docs/adr/`, which the empty directory exists for. Slices then follow the layer docs: `packages/backend/AGENTS.md`, `apps/website/AGENTS.md` and the query and form docs beneath it, and the `storybook` skill.
 
 ## Cookbook
 

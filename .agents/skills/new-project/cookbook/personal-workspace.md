@@ -21,7 +21,7 @@ grep -rlE "useOrganizations|useCreateOrganization|useSetActiveOrganization|useIn
 
 - `apps/website/src/routes/_authenticated/_shell/AGENTS.md`: step 4 of the reconciliation order (redirect to onboarding) no longer exists; state instead that every user owns exactly one organization, created at sign-up.
 - `packages/backend/AGENTS.md`: add one sentence under the Better Auth paragraph naming the two hooks and the invariant they keep.
-- `CONTEXT.md`: Organization is "the user's workspace, one per user".
+- `GLOSSARY.md`: Organization is "the user's workspace, one per user".
 
 ## Verify
 
