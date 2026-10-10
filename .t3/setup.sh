@@ -12,6 +12,15 @@ ROOT_PATH="$T3CODE_PROJECT_ROOT"
 # Unset for local threads, where T3 runs the script in the project root itself.
 WORKSPACE_PATH="${T3CODE_WORKTREE_PATH:-$PWD}"
 
+# T3 cuts a worktree from whatever the project root has checked out, which drifts behind origin/main.
+if [ "$(cd "$ROOT_PATH" && pwd -P)" != "$(cd "$WORKSPACE_PATH" && pwd -P)" ] &&
+    [ "$(git -C "$WORKSPACE_PATH" rev-parse HEAD)" = "$(git -C "$ROOT_PATH" rev-parse HEAD)" ] &&
+    [ -z "$(git -C "$WORKSPACE_PATH" status --porcelain)" ] &&
+    git -C "$WORKSPACE_PATH" fetch -q origin main; then
+    git -C "$WORKSPACE_PATH" reset -q --hard origin/main
+    echo "Moved the worktree onto origin/main ($(git -C "$WORKSPACE_PATH" rev-parse --short HEAD))"
+fi
+
 if [ "$(cd "$ROOT_PATH" && pwd -P)" = "$(cd "$WORKSPACE_PATH" && pwd -P)" ]; then
     echo "Running in the project root, nothing to symlink"
 else
