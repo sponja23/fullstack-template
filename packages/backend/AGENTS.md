@@ -66,6 +66,12 @@ This is a Node-ESM package, so relative imports include the explicit `.ts` exten
 
 Integration tests use real Postgres. Global setup resolves `TEST_PG_ADMIN_URL` when present or starts a testcontainer, migrates one template per run, and clones a database per suite. `TestHarness` constructs the production graph through `buildApp`, seeds a user and organization, and exposes typed callers. Substitute only the `EmailSender`; do not mock internal collaborators or export internals for tests.
 
+## Migrations
+
+`pnpm db:generate --name <name>` writes the next migration under `drizzle/` from the schema diff. It never connects, so any `DATABASE_URL` will do when `.env` lacks one; add `--custom` for an empty file to hold a data-only change.
+
+Deployed tables hold rows, and the test template migrates an empty database, so a failing `ADD COLUMN … NOT NULL` only shows up on deploy. Add a required column as nullable, backfill it, then set `NOT NULL`, all in one migration.
+
 ## References
 
 - Load the `packages` skill before editing manifests, TypeScript/Vite/Vitest configuration, Dockerfiles, or telemetry app entrypoints, and when diagnosing workspace resolution or missing automatic spans.
