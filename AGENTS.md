@@ -92,7 +92,7 @@ Work an open issue will do is the one thing inline may name a ticket, exactly as
 
 Don't re-explain at a consumer what its source already documents. State only what the code at hand adds; copy shared explanations into one canonical home rather than sibling files.
 
-Repository instructions live in directory-scoped `AGENTS.md` files. Sibling `CLAUDE.md` files are compatibility symlinks. Before designing, planning, or editing a path, read the instruction chain from the root through that path; the nearest file wins. Cross-cutting structure and build conventions live in the matching skill; design decisions and their alternatives live in `docs/adr/`.
+Repository instructions live in directory-scoped `AGENTS.md` files. Before designing, planning, or editing a path, read the instruction chain from the root through that path; the nearest file wins. Cross-cutting structure and build conventions live in the matching skill; design decisions and their alternatives live in `docs/adr/`.
 
 ## Agent skills
 
