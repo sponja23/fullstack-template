@@ -68,7 +68,7 @@ Search the entire checkout before editing; the result is the rename contract:
 grep -Rni --exclude-dir=.git --exclude-dir=node_modules acme .
 ```
 
-Rename lowercase `acme`, title-case `Acme`, and identifier forms such as `acmeAgency`. `CLAUDE.md` and `.claude/skills` are symlinks: edit their targets, since an in-place rewrite (`sed -i`, `perl -i`) replaces a symlink with a copy. The matches are grouped in these sites:
+Rename lowercase `acme`, title-case `Acme`, and identifier forms such as `acmeAgency`. The matches are grouped in these sites:
 
 - Repository identity and guidance: `package.json`, `README.md`, `AGENTS.md`, `.agents/skills/issue-tracker/SKILL.md`, and `docs/agents/triage-labels.md`.
 - Local database identity: `.env.example` and `docker-compose.yml`.
