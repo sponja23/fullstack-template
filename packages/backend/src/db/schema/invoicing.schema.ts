@@ -10,19 +10,15 @@ import {
     unique,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
+import {
+    CLIENT_STATUSES,
+    CURRENCIES,
+    INVOICE_STATUSES,
+    LINE_ITEM_KINDS,
+    PROJECT_STATUSES,
+} from "@repo/protocol";
 import { user } from "./auth.schema.ts";
 import { organization } from "./organizations.schema.ts";
-
-export const currencies = ["USD", "EUR"] as const;
-export type Currency = (typeof currencies)[number];
-export const clientStatuses = ["active", "archived"] as const;
-export type ClientStatus = (typeof clientStatuses)[number];
-export const projectStatuses = ["active", "archived"] as const;
-export type ProjectStatus = (typeof projectStatuses)[number];
-export const invoiceStatuses = ["draft", "issued", "paid", "void"] as const;
-export type InvoiceStatus = (typeof invoiceStatuses)[number];
-export const lineItemKinds = ["generated", "manual"] as const;
-export type LineItemKind = (typeof lineItemKinds)[number];
 
 export const clientNameUnique = "client_organization_name_unique";
 export const projectSlugUnique = "project_organization_slug_unique";
@@ -41,8 +37,8 @@ export const client = pgTable(
             .references(() => organization.id, { onDelete: "cascade" }),
         name: text("name").notNull(),
         billingEmail: text("billing_email").notNull(),
-        currency: text("currency", { enum: currencies }).notNull(),
-        status: text("status", { enum: clientStatuses }).default("active").notNull(),
+        currency: text("currency", { enum: CURRENCIES }).notNull(),
+        status: text("status", { enum: CLIENT_STATUSES }).default("active").notNull(),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at").defaultNow().notNull(),
     },
@@ -65,7 +61,7 @@ export const project = pgTable(
         name: text("name").notNull(),
         slug: text("slug").notNull(),
         rateMinor: integer("rate_minor").notNull(),
-        status: text("status", { enum: projectStatuses }).default("active").notNull(),
+        status: text("status", { enum: PROJECT_STATUSES }).default("active").notNull(),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at").defaultNow().notNull(),
     },
@@ -87,9 +83,9 @@ export const invoice = pgTable(
         clientId: text("client_id")
             .notNull()
             .references(() => client.id, { onDelete: "restrict" }),
-        currency: text("currency", { enum: currencies }).notNull(),
+        currency: text("currency", { enum: CURRENCIES }).notNull(),
         number: integer("number"),
-        status: text("status", { enum: invoiceStatuses }).default("draft").notNull(),
+        status: text("status", { enum: INVOICE_STATUSES }).default("draft").notNull(),
         issuedAt: timestamp("issued_at"),
         paidAt: timestamp("paid_at"),
         voidedAt: timestamp("voided_at"),
@@ -113,7 +109,7 @@ export const lineItem = pgTable(
             .notNull()
             .references(() => invoice.id, { onDelete: "cascade" }),
         projectId: text("project_id").references(() => project.id, { onDelete: "restrict" }),
-        kind: text("kind", { enum: lineItemKinds }).notNull(),
+        kind: text("kind", { enum: LINE_ITEM_KINDS }).notNull(),
         description: text("description").notNull(),
         quantity: integer("quantity").notNull(),
         unitAmountMinor: integer("unit_amount_minor").notNull(),

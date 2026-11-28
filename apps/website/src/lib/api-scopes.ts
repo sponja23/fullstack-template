@@ -1,7 +1,7 @@
-export const SCOPE_CATALOG = {
+import type { ApiScope } from "@repo/protocol";
+
+export const SCOPE_CATALOG: Record<ApiScope, string> = {
     "clients:read": "Read clients",
     "invoices:read": "Read invoices",
     "invoices:write": "Mark invoices paid",
-} as const;
-export type ApiScope = keyof typeof SCOPE_CATALOG;
-export const API_SCOPES = Object.keys(SCOPE_CATALOG) as ApiScope[];
+};

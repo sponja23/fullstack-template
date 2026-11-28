@@ -7,6 +7,8 @@ Forms use TanStack Form through a project-local layer that registers shared fiel
 ```text
 apps/website/src/
 ├── lib/form.ts
+├── lib/form-messages.ts
+├── lib/number-text.ts
 └── components/form/
     ├── text.field.tsx
     ├── select.field.tsx
@@ -36,6 +38,8 @@ A form whose fields are shaped for the UI rather than the mutation supplies `toV
 ## Validation behavior
 
 - Schemas live in the `.form.ts` module beside the hook and validate on change.
+- A field the server also receives takes its schema from `@repo/protocol`, and the form words its failures with `withMessages` (`lib/form-messages.ts`), by field and Zod issue code. Copy names a limit through `count(LIMIT)`.
+- A number typed as text converts and pipes into the protocol's schema through `numberText` or `amountText` (`lib/number-text.ts`), and a select takes the protocol's id schema, so the form states only the text's shape.
 - Field errors are touch-and-blur gated: show invalid state only when `meta.isTouched && !meta.isValid`.
 - Submit buttons disable only while submitting, not merely while invalid. Submitting an invalid form reveals validation errors.
 

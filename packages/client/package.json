@@ -17,6 +17,7 @@
     "build": "vp build"
   },
   "dependencies": {
+    "@repo/protocol": "workspace:*",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "superjson": "catalog:"

@@ -18,7 +18,7 @@ When adding a principal, build its link, hand it to `super`, add its auth-specif
 
 ## Paths
 
-The tRPC mount paths live in `paths.ts`, beside the clients that dial them, so a client builds its HTTP link from the same constant the API mounts the router at.
+A client builds its HTTP link from the mount path in `@repo/protocol` (`USER_TRPC_PATH`), the same constant the API mounts the router at.
 
 ## Contract re-exports
 

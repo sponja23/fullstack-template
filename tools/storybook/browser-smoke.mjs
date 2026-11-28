@@ -70,6 +70,10 @@ const pageContentByStoryPrefix = new Map([
     ["pages-login", "New to Acme?"],
     ["pages-signup", "Already have an account?"],
 ]);
+const contentByStoryId = new Map([
+    ["pages-projects-list--invalid-slug", "Keep the slug to 60 characters"],
+    ["pages-time--invalid-minutes", "Enter whole minutes"],
+]);
 const shellPagePrefixes = [
     "pages-clients-",
     "pages-projects-",
@@ -88,6 +92,15 @@ for (const id of storyIds) {
         await page.goto(`http://127.0.0.1:${address.port}/iframe.html?id=${id}&viewMode=story`, {
             waitUntil: "networkidle",
         });
+        const played = contentByStoryId.get(id);
+        if (played !== undefined) {
+            // A play function is still typing once the network is idle.
+            await page
+                .waitForFunction((text) => document.body.textContent?.includes(text), played, {
+                    timeout: 5000,
+                })
+                .catch(() => {});
+        }
         const state = await page.evaluate(() => {
             const root = document.querySelector("#storybook-root");
             const rootHasContent = !!root && root.children.length > 0;
@@ -106,6 +119,9 @@ for (const id of storyIds) {
         });
         if (!state.rendered) errors.push("rendered no content");
         if (state.storybookError) errors.push("Storybook displayed an error");
+        if (played !== undefined && !state.renderedText.includes(played)) {
+            errors.push(`missing played content: ${played}`);
+        }
         if (id.endsWith("--populated") || id.endsWith("--empty")) {
             const expected = [...pageContentByStoryPrefix].find(([prefix]) =>
                 id.startsWith(`${prefix}--`),

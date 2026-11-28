@@ -36,6 +36,10 @@ handlers through the plain-data `env` story parameter.
 
 ### State axes (page stories)
 
+A story that drives the page with a `play` function lists the text it ends on in
+`contentByStoryId` in `tools/storybook/browser-smoke.mjs`; Chromium waits for that text
+and fails the story without it.
+
 Skip a generic state axis only with an inline comment saying why. Loading and error
 stories render the route's own `pendingComponent` and `errorComponent`; add those
 product states or document why that axis does not apply instead of presenting a

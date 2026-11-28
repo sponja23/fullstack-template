@@ -7,8 +7,8 @@ import {
     buildDb,
     scopesFromMetadata,
 } from "@repo/backend";
-import { USER_TRPC_PATH } from "@repo/client";
 import { logger } from "@repo/logger";
+import { USER_TRPC_PATH } from "@repo/protocol";
 import { buildRestApi } from "@repo/rest-api";
 import type { TelemetryTeardown } from "@repo/telemetry";
 import { Hono } from "hono";

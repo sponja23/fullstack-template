@@ -1,3 +1,4 @@
+import { CURRENCIES, type Currency } from "@repo/protocol";
 import { FormError } from "@/components/form/form-error";
 import {
     useCreateClientForm,
@@ -5,6 +6,12 @@ import {
     useEditClientForm,
     useEditClientFormContext,
 } from "./client.form";
+
+const currencyLabels: Record<Currency, string> = {
+    USD: "USD — US dollar",
+    EUR: "EUR — Euro",
+};
+const currencyOptions = CURRENCIES.map((value) => ({ value, label: currencyLabels[value] }));
 
 export function CreateClientForm({ onSuccess }: { onSuccess: () => void }) {
     const form = useCreateClientForm({ onSuccess });
@@ -76,10 +83,7 @@ function CurrencyField() {
             {(field) => (
                 <field.SelectField
                     label="Currency"
-                    options={[
-                        { value: "USD", label: "USD — US dollar" },
-                        { value: "EUR", label: "EUR — Euro" },
-                    ]}
+                    options={currencyOptions}
                     description="Currency cannot be changed later."
                 />
             )}

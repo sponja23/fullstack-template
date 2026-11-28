@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { issueApiKeyInputSchema, revokeApiKeyInputSchema } from "@repo/protocol";
 import type { Auth } from "../../auth/factory.ts";
 import { ForbiddenError } from "../../errors/base.ts";
 import { type UserRouterBuilder, type UserRouterContext } from "../../trpc/user.procedures.ts";
-import { apiScopeSchema, scopesFromMetadata } from "./api-key-scopes.ts";
+import { scopesFromMetadata } from "./api-key-scopes.ts";
 
 export type ApiKeyUserRouterDeps = UserRouterContext;
 
@@ -28,13 +28,7 @@ export const apiKeyUserRouter = ((deps: ApiKeyUserRouterDeps) => {
     const { router, orgProcedure } = deps;
     return router({
         issue: orgProcedure
-            .input(
-                z.object({
-                    name: z.string().min(1).max(100),
-                    scopes: z.array(apiScopeSchema).nonempty(),
-                    expiresInSeconds: z.number().int().positive().optional(),
-                }),
-            )
+            .input(issueApiKeyInputSchema)
             .mutation(async ({ ctx: { auth, headers, session }, input }) => {
                 await requireOwner(auth, headers, session.organizationId);
                 const created = await auth.api.createApiKey({
@@ -68,7 +62,7 @@ export const apiKeyUserRouter = ((deps: ApiKeyUserRouterDeps) => {
             };
         }),
         revoke: orgProcedure
-            .input(z.object({ keyId: z.string() }))
+            .input(revokeApiKeyInputSchema)
             .mutation(async ({ ctx: { auth, headers, session }, input }) => {
                 await requireOwner(auth, headers, session.organizationId);
                 await auth.api.deleteApiKey({ body: { keyId: input.keyId }, headers });

@@ -1,8 +1,8 @@
 import { httpBatchLink } from "@trpc/client";
 import type { UserAppRouter } from "@repo/backend";
+import { USER_TRPC_PATH } from "@repo/protocol";
 import superjson from "superjson";
 import { BackendClient } from "./backend.client.ts";
-import { USER_TRPC_PATH } from "./paths.ts";
 
 export interface UserClientOptions {
     apiBaseUrl: string;

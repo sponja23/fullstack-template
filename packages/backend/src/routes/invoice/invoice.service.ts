@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { InvoiceStatus } from "../../db/schema/index.ts";
+import type { InvoiceStatus } from "@repo/protocol";
 import type { TransactionRunner } from "../../db/transaction.ts";
 import { ClientNotFoundError } from "../client/client.errors.ts";
 import type { ClientRepository } from "../client/client.repository.ts";

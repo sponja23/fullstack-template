@@ -83,6 +83,9 @@ jobs:
       - name: "@repo/logger"
         if: ${{ !cancelled() && steps.affected.outputs.logger == 'true' }}
         uses: ./packages/logger/ci/checks
+      - name: "@repo/protocol"
+        if: ${{ !cancelled() && steps.affected.outputs.protocol == 'true' }}
+        uses: ./packages/protocol/ci/checks
       - name: "@repo/rest-api"
         if: ${{ !cancelled() && steps.affected.outputs.rest_api == 'true' }}
         uses: ./packages/rest-api/ci/checks

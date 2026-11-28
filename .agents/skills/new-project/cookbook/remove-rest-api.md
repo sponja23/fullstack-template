@@ -14,7 +14,7 @@ Seams the grep does not name: the `services` object `buildApp` returns for the a
 
 1. **Package.** Delete `packages/rest-api` and its step in `.github/workflows/pr-checks.yml`. Remove the catalog entries that only it used (`pnpm remove` from the package before deleting it keeps the lockfile honest, or run `pnpm install` afterwards and prune the catalog by hand).
 2. **api.** Remove the adapter mount and the API-key verifier from the composition root. `buildApp` stops returning `services`.
-3. **Auth.** Remove the `apiKey` plugin from `buildAuth` and its schema mapping; delete the API-key schema module and the API-key route directory with its scopes; remove their exports from the package surface.
+3. **Auth.** Remove the `apiKey` plugin from `buildAuth` and its schema mapping; delete the API-key schema module, the API-key route directory, and `api-key.protocol.ts` with its scopes; remove their exports from both package surfaces.
 4. **Website.** Delete the API keys settings page, its query module, the scope labels helper, the settings sidebar entry, and the loader's API-key prefetch.
 5. **Storybook.** Remove the API-key world handlers and the settings stories that render keys.
 6. **Tests.** Remove the mint-and-verify case from the auth suite.

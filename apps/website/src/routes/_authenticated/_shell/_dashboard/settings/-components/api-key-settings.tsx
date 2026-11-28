@@ -3,7 +3,8 @@ import { Button } from "@repo/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
 import { Checkbox } from "@repo/ui/checkbox";
-import { API_SCOPES, SCOPE_CATALOG, type ApiScope } from "@/lib/api-scopes";
+import { API_SCOPES, type ApiScope } from "@repo/protocol";
+import { SCOPE_CATALOG } from "@/lib/api-scopes";
 import { useApiKeys, useIssueApiKey, useRevokeApiKey } from "@/lib/queries/api-keys.queries";
 
 export function ApiKeySettings() {
