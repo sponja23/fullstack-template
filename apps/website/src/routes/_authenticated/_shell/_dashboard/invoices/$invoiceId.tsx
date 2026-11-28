@@ -4,12 +4,10 @@ import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { Checkbox } from "@repo/ui/checkbox";
-import { Input } from "@repo/ui/input";
 import { RouteError, RoutePending } from "@/components/layout/route-state";
 import { ensureActiveOrganizationId } from "@/lib/queries/auth.queries";
 import {
     ensureInvoiceData,
-    useAddManualLine,
     useAddTimeLines,
     useInvoice,
     useIssueInvoice,
@@ -18,6 +16,7 @@ import {
     useUnbilledEntries,
     useVoidInvoice,
 } from "@/lib/queries/invoices.queries";
+import { ManualLineForm } from "./-components/manual-line-form";
 
 export const Route = createFileRoute("/_authenticated/_shell/_dashboard/invoices/$invoiceId")({
     loader: async ({ context, params }) => {
@@ -174,11 +173,7 @@ function LineItem({
 function DraftEditor({ invoiceId, currency }: { invoiceId: string; currency: string }) {
     const { data: entries } = useUnbilledEntries(invoiceId);
     const [selected, setSelected] = useState<string[]>([]);
-    const [description, setDescription] = useState("");
-    const [quantity, setQuantity] = useState("1");
-    const [amount, setAmount] = useState("");
     const addTime = useAddTimeLines();
-    const addManual = useAddManualLine();
     return (
         <div className="grid gap-6 md:grid-cols-2">
             <Card>
@@ -234,52 +229,7 @@ function DraftEditor({ invoiceId, currency }: { invoiceId: string; currency: str
                     <CardTitle>Manual line</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    <Input
-                        aria-label="Description"
-                        placeholder="Description"
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                        <Input
-                            aria-label="Quantity"
-                            type="number"
-                            min="1"
-                            value={quantity}
-                            onChange={(event) => setQuantity(event.target.value)}
-                        />
-                        <Input
-                            aria-label={`Unit amount in ${currency}`}
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder={`Amount (${currency})`}
-                            value={amount}
-                            onChange={(event) => setAmount(event.target.value)}
-                        />
-                    </div>
-                    <Button
-                        variant="outline"
-                        disabled={!description.trim() || !amount || addManual.isPending}
-                        onClick={() =>
-                            addManual.mutate(
-                                {
-                                    invoiceId,
-                                    description: description.trim(),
-                                    quantity: Number(quantity),
-                                    unitAmountMinor: Math.round(Number(amount) * 100),
-                                },
-                                {
-                                    onSuccess: () => {
-                                        setDescription("");
-                                        setAmount("");
-                                    },
-                                },
-                            )
-                        }
-                    >
-                        Add manual line
-                    </Button>
+                    <ManualLineForm invoiceId={invoiceId} currency={currency} />
                 </CardContent>
             </Card>
         </div>

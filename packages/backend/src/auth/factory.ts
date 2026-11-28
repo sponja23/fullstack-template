@@ -1,5 +1,6 @@
 import { apiKey } from "@better-auth/api-key";
 import { logger } from "@repo/logger";
+import { NAME_MAX_LENGTH } from "@repo/protocol";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, organization } from "better-auth/plugins";
@@ -91,7 +92,11 @@ export function buildAuth(config: AuthConfig) {
                 },
             }),
             admin({ adminRoles: [SUPERADMIN_ROLE], roles }),
-            apiKey({ references: "organization", enableMetadata: true }),
+            apiKey({
+                references: "organization",
+                enableMetadata: true,
+                maximumNameLength: NAME_MAX_LENGTH,
+            }),
         ],
     });
 }

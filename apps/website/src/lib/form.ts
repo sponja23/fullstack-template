@@ -2,6 +2,7 @@ import { createFormHook, createFormHookContexts, formOptions } from "@tanstack/r
 import type { UseMutationResult } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
 import type { BackendErrorCode, UserAppRouter } from "@repo/client";
+import { CheckboxGroupField } from "@/components/form/checkbox-group.field";
 import { SelectField } from "@/components/form/select.field";
 import { SubmitButton } from "@/components/form/submit-button";
 import { TextField } from "@/components/form/text.field";
@@ -16,7 +17,7 @@ const { fieldContext, formContext, useFieldContext, useFormContext } = createFor
 export const { useAppForm, withForm, useTypedAppFormContext } = createFormHook({
     fieldContext,
     formContext,
-    fieldComponents: { TextField, TextareaField, SelectField },
+    fieldComponents: { TextField, TextareaField, SelectField, CheckboxGroupField },
     formComponents: { SubmitButton },
 });
 

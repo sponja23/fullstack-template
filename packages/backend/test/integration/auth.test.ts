@@ -1,3 +1,4 @@
+import { NAME_MAX_LENGTH } from "@repo/protocol";
 import { count } from "drizzle-orm";
 import { expect } from "vitest";
 import { grantSuperadmin, SuperadminUserNotFoundError } from "../../src/auth/superadmin.ts";
@@ -132,6 +133,13 @@ apiTestSuite({
             const verified = await harness.auth.api.verifyApiKey({ body: { key: issued.key } });
             expect(verified.valid).toBe(true);
             expect(verified.key?.referenceId).toBe(harness.organizationId);
+        });
+
+        test("issues an API key whose name is as long as a name may be", async ({ request }) => {
+            const name = "k".repeat(NAME_MAX_LENGTH);
+            await expect(
+                request.apiKeys.issue({ name, scopes: ["clients:read"] }),
+            ).resolves.toMatchObject({ name });
         });
 
         test("refuses to grant superadmin to an unknown email", async ({ harness }) => {
