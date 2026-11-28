@@ -1,6 +1,7 @@
 import { NAME_MAX_LENGTH } from "@repo/protocol";
 import { count } from "drizzle-orm";
 import { expect } from "vitest";
+import { InvalidOrganizationFieldError } from "../../src/auth/organization-rules.ts";
 import { grantSuperadmin, SuperadminUserNotFoundError } from "../../src/auth/superadmin.ts";
 import { member, organization } from "../../src/db/schema/index.ts";
 import { FakeEmailSender } from "../fake-email-sender.ts";
@@ -140,6 +141,28 @@ apiTestSuite({
             await expect(
                 request.apiKeys.issue({ name, scopes: ["clients:read"] }),
             ).resolves.toMatchObject({ name });
+        });
+
+        test("refuses an organization whose slug breaks the slug rule", async ({ harness }) => {
+            const { cookieHeader } = await harness.signUpUser();
+            await expect(
+                harness.createOrganization(cookieHeader, "Not A Slug"),
+            ).rejects.toMatchObject({
+                constructor: InvalidOrganizationFieldError,
+                field: "slug",
+            });
+        });
+
+        test("refuses to rename an organization past the name limit", async ({ harness }) => {
+            await expect(
+                harness.auth.api.updateOrganization({
+                    body: {
+                        organizationId: harness.organizationId,
+                        data: { name: "n".repeat(NAME_MAX_LENGTH + 1) },
+                    },
+                    headers: harness.authHeaders(harness.cookieHeader),
+                }),
+            ).rejects.toMatchObject({ constructor: InvalidOrganizationFieldError, field: "name" });
         });
 
         test("refuses to grant superadmin to an unknown email", async ({ harness }) => {

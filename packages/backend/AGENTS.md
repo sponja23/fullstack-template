@@ -25,6 +25,8 @@ For an update that returns no row, read the `WHERE` clause before assigning mean
 
 Capabilities owned by better-auth are used directly. When auth configuration needs application data, inject a predicate or port instead of querying inside `buildAuth`. Invitation delivery through `EmailSender` is the local example. A read-only model over auth tables is acceptable when no API exposes the query; it never writes those tables.
 
+A rule on a field better-auth receives is enforced in that plugin's `before*` hook with the `@repo/protocol` schema the website's form builds on. `auth/organization-rules.ts` does this for an organization's name and slug.
+
 ### Where boundary schemas live
 
 A schema that crosses the wire, such as a router's input, lives in `@repo/protocol` and the router imports it; `packages/protocol/AGENTS.md` holds its rules. Any other Zod schema is co-located with its consumer, and promoted to `src/lib/` only when multiple resource modules share it. Keep cross-cutting concerns in named directories rather than loose under `routes/`.
@@ -53,6 +55,8 @@ Environment is read only in `apps/api/src/env.ts`; the parsed values enter `buil
 ## Errors
 
 Every backend error extends an abstract intermediate in `errors/base.ts` that fixes its `trpcCode`, such as `NotFoundError`; `trpcCode` is declared nowhere else. Add every new `errorCode` to the `BackendErrorCode` union. Invariant checks throw an `InternalServerError` subclass with an `<AREA>_INVARIANT_VIOLATION` code, and upstream failures extend `BadGatewayError`.
+
+A refusal thrown inside a better-auth hook extends better-auth's `APIError`, the only error its HTTP handler maps to a status.
 
 A repository write whose named Postgres constraint should surface as a domain error wraps only that statement with `withConstraintErrors(write, mapping)` from `db/constraint-errors.ts`. Export each mapped constraint name as a `const` from its schema module and use it both in the Drizzle declaration and as the mapping key. The helper rethrows the mapped domain error with the driver error as its cause; it never returns a violation from inside a transaction. Constraints that represent internal invariants remain unmapped and surface as 500s.
 
