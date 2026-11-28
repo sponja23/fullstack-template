@@ -1,7 +1,7 @@
+import type { ApiScope } from "@repo/protocol";
 import { type QueryClient, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { type TRPCProxy, useTRPC, useTRPCClient } from "@/lib/trpc";
 import { ensureAPIQueryData, useAPIMutation } from "./api-queries";
-import type { ApiScope } from "../api-scopes";
 
 export function useApiKeys() {
     const trpc = useTRPC();

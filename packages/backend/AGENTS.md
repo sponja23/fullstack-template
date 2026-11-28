@@ -17,7 +17,7 @@ Each domain resource lives under `src/routes/<resource>/` with up to three layer
 
 - Repository (`*.repository.ts`) is the only layer touching the database. It extends `DatabaseRepository`. A method that must run in a transaction takes `tx: Transaction`; one sometimes called in one takes `executor: DatabaseExecutor = this.database`. The repository translates database signals only it can decode into domain errors. Method names carry absence semantics: `find*`/`resolve*` ask and return a total value, while `require*` asserts and throws; add a `require*` only when every caller of the asking form already performs the same throw.
 - Service (`*.service.ts`) owns domain logic and orchestrates repositories. It opens transactions with the injected `TransactionRunner` (`db/transaction.ts`) and registers post-commit work with `scope.afterCommit`.
-- Router (`*.<principal>.router.ts`) validates with Zod, calls one service method, and returns the result. Declare builders with `satisfies <Principal>RouterBuilder<Deps>`.
+- Router (`*.<principal>.router.ts`) validates with a `@repo/protocol` input schema, calls one service method, and returns the result. Declare builders with `satisfies <Principal>RouterBuilder<Deps>`.
 
 Split repositories by table and owner; group by feature at the service and router layers.
 
@@ -27,11 +27,13 @@ Capabilities owned by better-auth are used directly. When auth configuration nee
 
 ### Where boundary schemas live
 
-Co-locate a Zod schema with its consumer. Promote it to `src/lib/` only when multiple resource modules share it. Keep cross-cutting concerns in named directories rather than loose under `routes/`.
+A schema that crosses the wire, such as a router's input, lives in `@repo/protocol` and the router imports it; `packages/protocol/AGENTS.md` holds its rules. Any other Zod schema is co-located with its consumer, and promoted to `src/lib/` only when multiple resource modules share it. Keep cross-cutting concerns in named directories rather than loose under `routes/`.
 
 ### Boundaries are schemas; types are derived
 
-Drizzle tables under `src/db/schema/` are the source of truth. Derive rows with `$inferSelect`; use enum columns, checks, compound constraints, and typed JSON columns to make invalid storage states impossible. Export each closed tuple and its derived union.
+Drizzle tables under `src/db/schema/` are the source of truth for storage. Derive rows with `$inferSelect`; use enum columns, checks, compound constraints, and typed JSON columns to make invalid storage states impossible.
+
+A closed set that crosses the wire, such as an invoice's statuses, is declared in `@repo/protocol`, and its column is built from that tuple. A set only storage uses keeps its tuple and derived union in its schema module.
 
 ## Principals and procedures
 

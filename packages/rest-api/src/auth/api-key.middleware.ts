@@ -1,4 +1,4 @@
-import type { ApiScope } from "@repo/backend";
+import type { ApiScope } from "@repo/protocol";
 import type { MiddlewareHandler } from "hono";
 import { errorBody } from "../http/error-response.ts";
 import type { ApiKeyVerifier, ApiPrincipal } from "./api-key-verifier.ts";

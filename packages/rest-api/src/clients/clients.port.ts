@@ -1,11 +1,11 @@
-import type { Currency } from "@repo/backend";
+import type { ClientStatus, Currency } from "@repo/protocol";
 
 export interface ClientRecord {
     id: string;
     name: string;
     billingEmail: string;
     currency: Currency;
-    status: "active" | "archived";
+    status: ClientStatus;
     createdAt: Date;
     updatedAt: Date;
 }

@@ -1,4 +1,5 @@
-import { BadRequestError, InvalidInputError, type ApiScope } from "@repo/backend";
+import { BadRequestError, InvalidInputError } from "@repo/backend";
+import type { ApiScope } from "@repo/protocol";
 import { type OpenAPIHono, type RouteConfig, createRoute, z } from "@hono/zod-openapi";
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";

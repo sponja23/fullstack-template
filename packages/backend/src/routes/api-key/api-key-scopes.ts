@@ -1,8 +1,4 @@
-import { z } from "zod";
-
-export const API_SCOPES = ["clients:read", "invoices:read", "invoices:write"] as const;
-export type ApiScope = (typeof API_SCOPES)[number];
-export const apiScopeSchema = z.enum(API_SCOPES);
+import { API_SCOPES, type ApiScope } from "@repo/protocol";
 
 export interface ApiKeyMetadata {
     scopes: ApiScope[];

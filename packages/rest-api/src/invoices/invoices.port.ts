@@ -1,4 +1,4 @@
-import type { Currency, InvoiceStatus, LineItemKind } from "@repo/backend";
+import type { Currency, InvoiceStatus, LineItemKind } from "@repo/protocol";
 
 export interface InvoiceLineRecord {
     id: string;

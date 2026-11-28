@@ -1,7 +1,8 @@
+import type { Currency } from "@repo/protocol";
 import { and, asc, eq } from "drizzle-orm";
 import { withConstraintErrors } from "../../db/constraint-errors.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
-import { client, clientNameUnique, type Currency } from "../../db/schema/index.ts";
+import { client, clientNameUnique } from "../../db/schema/index.ts";
 import {
     ClientInvariantError,
     ClientNameTakenError,

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { Currency } from "../../db/schema/index.ts";
+import type { Currency } from "@repo/protocol";
 import { ClientNotFoundError } from "./client.errors.ts";
 import type { ClientRepository } from "./client.repository.ts";
 

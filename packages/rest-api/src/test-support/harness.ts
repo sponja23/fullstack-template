@@ -1,4 +1,4 @@
-import type { ApiScope } from "@repo/backend";
+import type { ApiScope } from "@repo/protocol";
 import { buildRestApi } from "../rest-api.ts";
 import { FakeClients } from "./fake-clients.ts";
 import { FakeInvoices } from "./fake-invoices.ts";

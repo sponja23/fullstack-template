@@ -1,3 +1,4 @@
+import { NOTE_MAX_LENGTH, dateSchema, idSchema, minutesSchema, noteSchema } from "@repo/protocol";
 import { z } from "zod";
 import {
     type FormErrorConfig,
@@ -5,23 +6,33 @@ import {
     useMutationForm,
     useTypedAppFormContext,
 } from "@/lib/form";
+import { count, withMessages } from "@/lib/form-messages";
+import { numberText } from "@/lib/number-text";
 import { useCreateTimeEntry, useUpdateTimeEntry } from "@/lib/queries/time-entries.queries";
 
 const createOptions = formOptions({
     defaultValues: { projectId: "", date: "", minutes: "", note: "" },
 });
 const editOptions = formOptions({ defaultValues: { date: "", minutes: "", note: "" } });
-const dateSchema = z.string().date("Enter a valid date");
-const minutesSchema = z
-    .string()
-    .regex(/^\d+$/, "Enter whole minutes")
-    .refine((value) => Number(value) > 0, "Minutes must be positive");
-const createSchema = z.object({
-    projectId: z.string().min(1, "Choose a project"),
+const fields = {
     date: dateSchema,
-    minutes: minutesSchema,
-    note: z.string().trim().max(1_000),
+    minutes: numberText(minutesSchema),
+    note: noteSchema,
+};
+const messages = {
+    date: { invalid_format: "Enter a valid date" },
+    minutes: {
+        invalid_format: "Enter whole minutes",
+        invalid_type: "Enter whole minutes",
+        too_small: "Minutes must be positive",
+    },
+    note: { too_big: `Keep the note to ${count(NOTE_MAX_LENGTH)} characters` },
+};
+const createSchema = withMessages(z.object({ projectId: idSchema, ...fields }), {
+    projectId: { invalid_format: "Choose a project" },
+    ...messages,
 });
+const editSchema = withMessages(z.object(fields), messages);
 const createErrors: FormErrorConfig<(typeof createOptions)["defaultValues"]> = {
     PROJECT_ARCHIVED: { message: "Archived projects do not accept new time entries." },
 };
@@ -71,7 +82,7 @@ export function useEditTimeEntryForm({
     return useMutationForm({
         ...editOptions,
         defaultValues: { date: entry.date, minutes: String(entry.minutes), note: entry.note },
-        validators: { onChange: createSchema.omit({ projectId: true }) },
+        validators: { onChange: editSchema },
         mutation: useUpdateTimeEntry(),
         errorConfig: editErrors,
         toVariables: (values) => ({

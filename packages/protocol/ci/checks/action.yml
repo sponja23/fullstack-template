@@ -1,0 +1,9 @@
+name: Checks for @repo/protocol
+description: Run static checks.
+runs:
+  using: composite
+  steps:
+    - name: Static checks
+      shell: bash
+      working-directory: packages/protocol
+      run: pnpm exec vp check --no-error-on-unmatched-pattern .

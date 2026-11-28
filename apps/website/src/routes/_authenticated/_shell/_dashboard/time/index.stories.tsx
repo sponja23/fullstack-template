@@ -1,4 +1,5 @@
 import type { Meta, RouterParameters, StoryObj } from "@storybook/tanstack-react";
+import { screen, userEvent } from "storybook/test";
 import { storyRoute } from "@/routes/-story-route";
 
 const parents = {
@@ -18,6 +19,19 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Populated: Story = { parameters: { env: { world: "acmeAgency" } } };
 export const Empty: Story = { parameters: { env: { world: "emptyOrg" } } };
+export const InvalidMinutes: Story = {
+    parameters: { env: { world: "acmeAgency" } },
+    play: async () => {
+        const minutes = await screen.findByLabelText("Minutes");
+        await userEvent.type(minutes, "0");
+        await userEvent.tab();
+        await screen.findByText("Minutes must be positive");
+        await userEvent.clear(minutes);
+        await userEvent.type(minutes, "1.5");
+        await userEvent.tab();
+        await screen.findByText("Enter whole minutes");
+    },
+};
 export const Loading: Story = {
     parameters: {
         env: { world: "emptyOrg" },

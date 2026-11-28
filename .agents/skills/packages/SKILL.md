@@ -8,7 +8,7 @@ description: Always read before editing workspace manifests, TypeScript/Vite/Vit
 ## Apps, packages, and tools
 
 - **`apps/*`** are runnable units with an entrypoint, such as `apps/api` and `apps/website`.
-- **`packages/*`** are reusable libraries, such as `backend`, `logger`, `telemetry`, `rest-api`, `ui`, and `utils`.
+- **`packages/*`** are reusable libraries, such as `backend`, `protocol`, `logger`, `telemetry`, `rest-api`, `ui`, and `utils`.
 - **`tools/*`** are internal runnable tooling, such as the Storybook catalog.
 
 `tools/` is a dependency sink: a tool may import from apps and packages, while nothing in apps or packages imports from tools. Because apps have no package exports, a tool reaches app source through an explicit alias rather than `@repo/<app>` resolution; `tools/storybook/vite.config.ts` is the local example.

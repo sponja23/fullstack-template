@@ -1,11 +1,11 @@
 import { z } from "@hono/zod-openapi";
+import { CURRENCIES, INVOICE_STATUSES, LINE_ITEM_KINDS } from "@repo/protocol";
 import type { RouteRegistrar } from "../http/authenticated-route.ts";
 import type { InvoiceRecord, InvoicesPort } from "./invoices.port.ts";
 
-const statuses = ["draft", "issued", "paid", "void"] as const;
 const lineItemResourceSchema = z.object({
     id: z.string().uuid(),
-    kind: z.enum(["generated", "manual"]),
+    kind: z.enum(LINE_ITEM_KINDS),
     description: z.string(),
     quantity: z.number().int(),
     unitAmountMinor: z.number().int(),
@@ -17,9 +17,9 @@ const invoiceResourceSchema = z
         clientId: z.string().uuid(),
         clientName: z.string(),
         billingEmail: z.string().email(),
-        currency: z.enum(["USD", "EUR"]),
+        currency: z.enum(CURRENCIES),
         number: z.number().int().nullable(),
-        status: z.enum(statuses),
+        status: z.enum(INVOICE_STATUSES),
         issuedAt: z.string().datetime().nullable(),
         paidAt: z.string().datetime().nullable(),
         voidedAt: z.string().datetime().nullable(),
@@ -60,7 +60,7 @@ export function registerInvoiceRoutes(register: RouteRegistrar, invoices: Invoic
         scope: "invoices:read",
         summary: "List invoices",
         tags: ["Invoices"],
-        request: { query: z.object({ status: z.enum(statuses).optional() }) },
+        request: { query: z.object({ status: z.enum(INVOICE_STATUSES).optional() }) },
         responses: {
             200: {
                 description: "The organization's invoices.",

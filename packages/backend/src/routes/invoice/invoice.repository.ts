@@ -1,3 +1,4 @@
+import type { Currency, InvoiceStatus, LineItemKind } from "@repo/protocol";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { DatabaseExecutor, Transaction } from "../../db/factory.ts";
 import { DatabaseRepository } from "../../db/repository.ts";
@@ -8,9 +9,6 @@ import {
     lineItem,
     project,
     timeEntry,
-    type Currency,
-    type InvoiceStatus,
-    type LineItemKind,
 } from "../../db/schema/index.ts";
 import { InvoiceInvariantError, InvoiceNotFoundError } from "./invoice.errors.ts";
 

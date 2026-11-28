@@ -1,3 +1,4 @@
+import { INVOICE_STATUSES, type InvoiceStatus } from "@repo/protocol";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
@@ -16,6 +17,13 @@ export const Route = createFileRoute("/_authenticated/_shell/_dashboard/invoices
     errorComponent: RouteError,
     component: InvoicesPage,
 });
+
+const statusLabels: Record<InvoiceStatus, string> = {
+    draft: "Draft",
+    issued: "Issued",
+    paid: "Paid",
+    void: "Void",
+};
 
 function money(amount: number, currency: string) {
     return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount / 100);
@@ -42,10 +50,11 @@ function InvoicesPage() {
                         onChange={(event) => setStatus(event.target.value)}
                     >
                         <NativeSelectOption value="all">All statuses</NativeSelectOption>
-                        <NativeSelectOption value="draft">Draft</NativeSelectOption>
-                        <NativeSelectOption value="issued">Issued</NativeSelectOption>
-                        <NativeSelectOption value="paid">Paid</NativeSelectOption>
-                        <NativeSelectOption value="void">Void</NativeSelectOption>
+                        {INVOICE_STATUSES.map((value) => (
+                            <NativeSelectOption key={value} value={value}>
+                                {statusLabels[value]}
+                            </NativeSelectOption>
+                        ))}
                     </NativeSelect>
                     <Button render={<Link to="/invoices/new" />}>New invoice</Button>
                 </div>

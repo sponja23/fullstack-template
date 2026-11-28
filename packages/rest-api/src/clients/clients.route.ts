@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { CLIENT_STATUSES, CURRENCIES } from "@repo/protocol";
 import type { RouteRegistrar } from "../http/authenticated-route.ts";
 import type { ClientRecord, ClientsPort } from "./clients.port.ts";
 
@@ -7,8 +8,8 @@ const clientResourceSchema = z
         id: z.string().uuid(),
         name: z.string(),
         billingEmail: z.string().email(),
-        currency: z.enum(["USD", "EUR"]),
-        status: z.enum(["active", "archived"]),
+        currency: z.enum(CURRENCIES),
+        status: z.enum(CLIENT_STATUSES),
         createdAt: z.string().datetime(),
         updatedAt: z.string().datetime(),
     })

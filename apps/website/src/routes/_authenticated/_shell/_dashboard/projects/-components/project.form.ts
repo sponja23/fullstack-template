@@ -1,3 +1,4 @@
+import { idSchema, nameSchema, rateMinorSchema, slugSchema } from "@repo/protocol";
 import { z } from "zod";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -6,30 +7,31 @@ import {
     useMutationForm,
     useTypedAppFormContext,
 } from "@/lib/form";
+import { nameMessages, slugMessages, withMessages } from "@/lib/form-messages";
+import { amountText, toMinor } from "@/lib/number-text";
 import { useCreateProject, useUpdateProject } from "@/lib/queries/projects.queries";
-import { slugRegex } from "@/lib/slug";
 
 const projectOptions = formOptions({
     defaultValues: { clientId: "", name: "", slug: "", hourlyRate: "" },
 });
-const projectSchema = z.object({
-    clientId: z.string().min(1, "Choose a client"),
-    name: z.string().trim().min(1, "Name is required").max(120),
-    slug: z
-        .string()
-        .min(1, "Slug is required")
-        .max(60)
-        .regex(slugRegex, "Use lowercase letters, numbers, and hyphens"),
-    hourlyRate: z.string().regex(/^\d+(\.\d{1,2})?$/, "Enter a non-negative amount"),
-});
+const projectSchema = withMessages(
+    z.object({
+        clientId: idSchema,
+        name: nameSchema,
+        slug: slugSchema,
+        hourlyRate: amountText(rateMinorSchema),
+    }),
+    {
+        clientId: { invalid_format: "Choose a client" },
+        name: nameMessages,
+        slug: slugMessages,
+        hourlyRate: { invalid_format: "Enter a non-negative amount" },
+    },
+);
 type ProjectValues = (typeof projectOptions)["defaultValues"];
 const projectErrors: FormErrorConfig<ProjectValues> = {
     PROJECT_SLUG_TAKEN: { field: "slug", message: "This project slug is already taken." },
 };
-
-function rateMinor(value: string): number {
-    return Math.round(Number(value) * 100);
-}
 
 export function useCreateProjectForm({
     initialClientId,
@@ -48,7 +50,7 @@ export function useCreateProjectForm({
             clientId: values.clientId,
             name: values.name,
             slug: values.slug,
-            rateMinor: rateMinor(values.hourlyRate),
+            rateMinor: toMinor(values.hourlyRate),
         }),
         onSuccess,
     });
@@ -77,7 +79,7 @@ export function useEditProjectForm(project: {
             id: project.id,
             name: values.name,
             slug: values.slug,
-            rateMinor: rateMinor(values.hourlyRate),
+            rateMinor: toMinor(values.hourlyRate),
         }),
         onSuccess: (updated) =>
             navigate({

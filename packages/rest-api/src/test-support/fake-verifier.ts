@@ -1,4 +1,4 @@
-import type { ApiScope } from "@repo/backend";
+import type { ApiScope } from "@repo/protocol";
 import type { ApiKeyVerifier } from "../auth/api-key-verifier.ts";
 
 export function fakeVerifier(

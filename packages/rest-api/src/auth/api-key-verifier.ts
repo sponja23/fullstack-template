@@ -1,4 +1,4 @@
-import type { ApiScope } from "@repo/backend";
+import type { ApiScope } from "@repo/protocol";
 
 export interface ApiPrincipal {
     organizationId: string;
