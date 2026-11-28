@@ -1,5 +1,3 @@
-export const slugRegex = /^[a-z0-9-]+$/;
-
 export function slugify(value: string): string {
     return value
         .toLowerCase()

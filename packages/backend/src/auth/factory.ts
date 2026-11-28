@@ -10,6 +10,7 @@ import * as orgSchema from "../db/schema/organizations.schema.ts";
 import type { Database } from "../db/factory.ts";
 import type { EmailSender } from "../email/email-sender.ts";
 import { roles } from "./access.ts";
+import { ruledOrganization } from "./organization-rules.ts";
 import { revokeMemberSessions } from "./session-revocation.ts";
 import { SUPERADMIN_ROLE } from "./superadmin.ts";
 
@@ -78,6 +79,12 @@ export function buildAuth(config: AuthConfig) {
                         text: `Invitation ${id} for role ${role}. Accept at ${config.webUrl}/onboarding`,
                     }),
                 organizationHooks: {
+                    beforeCreateOrganization: async ({ organization }) => ({
+                        data: ruledOrganization(organization),
+                    }),
+                    beforeUpdateOrganization: async ({ organization }) => ({
+                        data: ruledOrganization(organization),
+                    }),
                     afterRemoveMember: async ({ member, organization: removedFrom }) => {
                         const revokedSessions = await revokeMemberSessions(config.db, {
                             userId: member.userId,

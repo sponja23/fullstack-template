@@ -14,7 +14,7 @@ Seams the grep does not name: the dashboard route's `beforeLoad` (it reconciles 
 
 ## Steps
 
-1. **Auth.** Remove the `organization` plugin from `buildAuth` with its schema mapping, invitation email, and the after-remove-member hook; delete the session-revocation helper it called. Drop `activeOrganizationId` from the session table. Delete the organizations schema module and the member and invitation relations the user table declares.
+1. **Auth.** Remove the `organization` plugin from `buildAuth` with its schema mapping, invitation email, and its hooks; delete the session-revocation helper and `auth/organization-rules.ts` they called. Drop `activeOrganizationId` from the session table. Delete the organizations schema module and the member and invitation relations the user table declares.
 2. **Procedures.** Delete `orgProcedure`, `OrgSession`, and `toOrgSession`. `authProcedure` is the only user procedure; the tenant key is `session.user.id`. Remove `orgProcedure` from the router context type and every router's `Deps`.
 3. **Tables.** Every domain table's `organization_id` becomes `user_id` referencing the user. Repositories filter on it exactly as they filtered on the organization; the per-query isolation rule is unchanged, only the column is.
 4. **API keys.** `apiKey({ references: "user" })`; the key router mints with the user's id as `referenceId`. In the REST adapter the principal carries `userId` instead of `organizationId`, and the composition root's verifier passes the reference id through unchanged.

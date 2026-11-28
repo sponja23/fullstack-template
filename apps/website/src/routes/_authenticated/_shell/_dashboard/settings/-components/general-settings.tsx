@@ -19,6 +19,7 @@ import {
     DialogTitle,
 } from "@repo/ui/dialog";
 import { Input } from "@repo/ui/input";
+import { nameSchema } from "@repo/protocol";
 import { z } from "zod";
 import { FormError } from "@/components/form/form-error";
 import {
@@ -27,6 +28,7 @@ import {
     useMutationForm,
     useTypedAppFormContext,
 } from "@/lib/form";
+import { nameMessages, withMessages } from "@/lib/form-messages";
 import { useUser } from "@/lib/queries/auth.queries";
 import {
     useActiveOrganization,
@@ -39,6 +41,7 @@ import { isAdmin, isOwner } from "@/lib/role";
 import { useManageableOrgId } from "./manageable-org";
 
 const options = formOptions({ defaultValues: { name: "" } });
+const schema = withMessages(z.object({ name: nameSchema }), { name: nameMessages });
 const errorConfig: FormErrorConfig<{ name: string }> = {
     YOU_ARE_NOT_ALLOWED_TO_UPDATE_THIS_ORGANIZATION: {
         message: "You cannot rename this organization.",
@@ -78,9 +81,7 @@ function EditableIdentity({ name, slug }: { name: string; slug: string }) {
     const form = useMutationForm({
         ...options,
         defaultValues: { name },
-        validators: {
-            onChange: z.object({ name: z.string().trim().min(1, "Name is required").max(120) }),
-        },
+        validators: { onChange: schema },
         mutation,
         errorConfig,
     });

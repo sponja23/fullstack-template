@@ -1,3 +1,4 @@
+import { nameSchema, slugSchema } from "@repo/protocol";
 import { z } from "zod";
 import {
     type FormErrorConfig,
@@ -5,19 +6,15 @@ import {
     useMutationForm,
     useTypedAppFormContext,
 } from "@/lib/form";
+import { nameMessages, slugMessages, withMessages } from "@/lib/form-messages";
 import {
     useCreateOrganization,
     useSetActiveOrganization,
 } from "@/lib/queries/organizations.queries";
-import { slugRegex } from "@/lib/slug";
 
-const schema = z.object({
-    name: z.string().trim().min(1, "Name is required").max(120, "Name is too long"),
-    slug: z
-        .string()
-        .min(1, "Slug is required")
-        .max(60, "Slug is too long")
-        .regex(slugRegex, "Lowercase letters, numbers, and hyphens only"),
+const schema = withMessages(z.object({ name: nameSchema, slug: slugSchema }), {
+    name: nameMessages,
+    slug: slugMessages,
 });
 
 const options = formOptions({ defaultValues: { name: "", slug: "" } });
